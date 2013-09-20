@@ -17,6 +17,7 @@ PYTHON_PACKAGES=/usr/lib/pymodules/python2.6
 # Commands
 SYNC=rsync -vrtlp
 
+# xivo-ctid
 cti.unittest:
 ifdef TARGET_FILE
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
@@ -26,3 +27,4 @@ endif
 
 cti.sync:
 	$(SYNC) $(XIVO_CTID_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-ctid restart'
