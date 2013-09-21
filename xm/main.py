@@ -36,8 +36,11 @@ def _new_argument_parser():
         action='store_const', const=True, default=False,
     )
     parser.add_argument(
-        'project', metavar='project', type=str, nargs='+',
-        help='The selected project',
+        '-t', '--target', help='the target on which to run'
+    )
+    parser.add_argument(
+        'extra', metavar='extra', type=str, nargs='*',
+        help='Extra variables, usage vary depending on the context',
     )
 
     return parser
