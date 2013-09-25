@@ -14,7 +14,7 @@ class TestTargetParser(unittest.TestCase):
     def setUp(self):
         self._target = 'cti'
         self._cti_path = '/dev/xivo_cti'
-        settings.projects[self._target]['path'] = self._cti_path
+        settings.projects = {self._target: {'path': self._cti_path}}
 
     def test_non_empty_target(self):
         parsed_args = argparse.Namespace(target=self._target)
