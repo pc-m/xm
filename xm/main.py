@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 import argparse
 
+from xm.parser import target_parser
+from xm.parser import config_file_name_parser
 
 DEFAULT_CONFIG_FILE = '~/.config/xmrc'
 
@@ -39,6 +41,10 @@ def _new_argument_parser():
         '-t', '--target', help='the target on which to run'
     )
     parser.add_argument(
+        '-p', '--profile', help='select a profile to use',
+        default='default'
+    )
+    parser.add_argument(
         'extra', metavar='extra', type=str, nargs='*',
         help='Extra variables, usage vary depending on the context',
     )
@@ -49,7 +55,7 @@ def _new_argument_parser():
 def main():
     parsed_args = _new_argument_parser().parse_args()
     print(parsed_args)
-
-
-if __name__ == '__main__':
-    main()
+    config_file = config_file_name_parser.ConfigFileNameParser(parsed_args).file()
+    print(config_file)
+    project = target_parser.TargetParser(parsed_args).target()
+    print(project)
