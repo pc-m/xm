@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import argparse
 
+from xm import settings
 from xm.parser import target_parser
 from xm.parser import config_file_name_parser
 
@@ -54,8 +55,8 @@ def _new_argument_parser():
 
 def main():
     parsed_args = _new_argument_parser().parse_args()
-    print(parsed_args)
     config_file = config_file_name_parser.ConfigFileNameParser(parsed_args).file()
-    print(config_file)
+    settings.init_from_file(config_file)
     project = target_parser.TargetParser(parsed_args).target()
-    print(project)
+    for command in parsed_args.commands:
+        print(command)
