@@ -2,7 +2,7 @@
 xivo_hostname=xivo-dev
 
 [projects]
-xivo_path='~/dev/xivo'
+xivo_path=~/dev/xivo
 
 [projects.cti]
-path=%(xivo_path)s/cti
+path=${projects:xivo_path}/xivo-ctid
