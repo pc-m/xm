@@ -2,7 +2,7 @@
 
 ## Overview
 
-xm is a simple command line tool I use to do various actions when working on XiVO
+xm is a simple command line tool I use to do various actions when developing XiVO
 on a remote server.
 
 This tool is 100% XiVO specific.
@@ -21,7 +21,7 @@ If the TARGET_FILE argument is supplied, the test runner will be run on the spec
 or directory only.
 
 
-### Syncing to local copy of xivo-ctid to a remote XiVO
+### Syncing the local copy of xivo-ctid to a remote XiVO
 
 > make -f <path/to/xm>/Makefile cti.sync XIVO_PATH=<path/to/xivo/source/code> XIVO_HOSTNAME=<hostname>
 
