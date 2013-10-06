@@ -12,6 +12,10 @@ This tool is 100% XiVO specific.
 
 xm is made of a single make file allowing some operations on specific repositories.
 
+I currently use an alias to make the invocation shorter
+
+> alias xm='make -f ~/dev/xm/Makefile XIVO_HOSTNAME=xivo-dev XIVO_PATH=~/dev/xivo'
+
 
 ### Running xivo-ctid unit-tests
 
