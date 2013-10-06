@@ -33,6 +33,9 @@ cti.sync:
 	$(SYNC) $(XIVO_CTID_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-ctid restart'
 
+cti.ctags:
+	ctags -R -e $(XIVO_CTID_LOCAL_PATH)
+
 # xivo-libsccp
 sccp.sync:
 	cd $(XIVO_LIBSCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) makei
