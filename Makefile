@@ -26,7 +26,7 @@ PYTHON_PACKAGES=/usr/lib/pymodules/python2.6
 CTI_TAGS=$(CTI_PATH)/TAGS
 
 # Commands
-SYNC=rsync -vrtlp
+SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
 XIVO_LIBSCCP_BUILDH=./build-tools/buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
