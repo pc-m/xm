@@ -10,6 +10,7 @@ XIVO_PYTHONPATH=$(XIVO_LIB_PYTHON_PYTHONPATH):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD
 
 # Local paths
 XIVO_CTID_LOCAL_PATH=$(XIVO_CTID_PYTHONPATH)/xivo_cti
+XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
 XIVO_LIBSCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
 STARTING_DIR=$(CURDIR)
 
@@ -35,6 +36,7 @@ cti.sync:
 
 cti.ctags:
 	ctags -R -e $(XIVO_CTID_LOCAL_PATH)
+	ctags -R -e -a $(XIVO_DAO_LOCAL_PATH)
 
 # xivo-libsccp
 sccp.sync:
