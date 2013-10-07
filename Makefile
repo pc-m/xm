@@ -26,6 +26,7 @@ PYTHON_PACKAGES=/usr/lib/pymodules/python2.6
 
 # Tags
 CTI_TAGS=$(CTI_PATH)/TAGS
+AGI_TAGS=$(AGI_PATH)/TAGS
 
 # Commands
 SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
@@ -39,6 +40,10 @@ ifdef TARGET_FILE
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(AGI_LOCAL_PATH)
 endif
+
+agi.ctags:
+	rm -f $(AGI_TAGS)
+	ctags -o $(AGI_TAGS) -R -e $(AGI_LOCAL_PATH)
 
 # xivo-ctid
 cti.unittest:
