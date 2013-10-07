@@ -1,4 +1,5 @@
 # XiVO paths
+AGI_PATH=$(XIVO_PATH)/xivo-agid
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
 
@@ -13,6 +14,7 @@ CTI_PP=$(CTI_PATH)/xivo-ctid
 XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):$(XIVO_AGENT_PYTHONPATH):$(XIVO_PROVD_PYTHONPATH):$(CTI_PP)
 
 # Local paths
+AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
@@ -29,6 +31,14 @@ CTI_TAGS=$(CTI_PATH)/TAGS
 SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
 XIVO_LIBSCCP_BUILDH=./build-tools/buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
+
+# xivo-agid
+agi.unittest:
+ifdef TARGET_FILE
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
+else
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(AGI_LOCAL_PATH)
+endif
 
 # xivo-ctid
 cti.unittest:
