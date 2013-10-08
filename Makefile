@@ -1,7 +1,9 @@
 # XiVO paths
+ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGI_PATH=$(XIVO_PATH)/xivo-agid
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
+SCCP_PATH=$(XIVO_PATH)/xivo-libsccp
 
 # PYTHONPATHS
 LIB_PYTHON_PP=$(LIB_PYTHON_PATH)/xivo-lib-python
@@ -15,10 +17,11 @@ XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):
 
 # Local paths
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
+ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
-XIVO_LIBSCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
+SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
 WEBI_LOCAL_PATH=$(XIVO_PATH)/xivo-web-interface/xivo-web-interface/src/
 STARTING_DIR=$(CURDIR)
 
@@ -29,6 +32,7 @@ WEBI_REMOTE_PATH=/usr/share/xivo-web-interface
 # Tags
 CTI_TAGS=$(CTI_PATH)/TAGS
 AGI_TAGS=$(AGI_PATH)/TAGS
+SCCP_TAGS=$(SCCP_PATH)/TAGS
 
 # Commands
 SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
@@ -71,10 +75,16 @@ cti.ctags:
 
 # xivo-libsccp
 sccp.sync:
-	cd $(XIVO_LIBSCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) makei
+	cd $(SCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) makei
 
 sccp.dep:
 	ssh $(XIVO_HOSTNAME) $(XIVO_LIBSCCP_DEP_COMMAND)
 
 sccp.setup:
-	cd $(XIVO_LIBSCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) init
+	cd $(SCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) init
+
+
+sccp.ctags:
+	rm -f $(SCCP_TAGS)
+	ctags -o $(SCCP_TAGS) -R -e $(SCCP_LOCAL_PATH)
+	ctags -o $(SCCP_TAGS) -R -e -a $(ASTERISK_LOCAL_PATH)
