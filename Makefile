@@ -19,10 +19,12 @@ CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
 XIVO_LIBSCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
+WEBI_LOCAL_PATH=$(XIVO_PATH)/xivo-web-interface/xivo-web-interface/src/
 STARTING_DIR=$(CURDIR)
 
 # Remote paths
 PYTHON_PACKAGES=/usr/lib/pymodules/python2.6
+WEBI_REMOTE_PATH=/usr/share/xivo-web-interface
 
 # Tags
 CTI_TAGS=$(CTI_PATH)/TAGS
@@ -32,6 +34,10 @@ AGI_TAGS=$(AGI_PATH)/TAGS
 SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
 XIVO_LIBSCCP_BUILDH=./build-tools/buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
+
+# xivo-web-interface
+webi.sync:
+	$(SYNC) $(WEBI_LOCAL_PATH) $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
 
 # xivo-agid
 agi.unittest:
