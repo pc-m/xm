@@ -34,6 +34,8 @@ CTI_TAGS=$(CTI_PATH)/TAGS
 AGI_TAGS=$(AGI_PATH)/TAGS
 SCCP_TAGS=$(SCCP_PATH)/TAGS
 
+SCCP_CSCOPE_FILES=$(SCCP_PATH)/cscope.files
+
 # Commands
 SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
 XIVO_LIBSCCP_BUILDH=./build-tools/buildh
@@ -83,8 +85,12 @@ sccp.dep:
 sccp.setup:
 	cd $(SCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) init
 
-
 sccp.ctags:
 	rm -f $(SCCP_TAGS)
 	ctags -o $(SCCP_TAGS) -R -e $(SCCP_LOCAL_PATH)
 	ctags -o $(SCCP_TAGS) -R -e -a $(ASTERISK_LOCAL_PATH)
+
+sccp.cscope:
+	rm -f $(SCCP_CSCOPE_FILES)
+	find $(SCCP_LOCAL_PATH) -name "*.c" -o -name "*.h" > $(SCCP_CSCOPE_FILES)
+	find $(ASTERISK_LOCAL_PATH) -name "*.c" -o -name "*.h" >> $(SCCP_CSCOPE_FILES)
