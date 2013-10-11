@@ -42,22 +42,26 @@ XIVO_LIBSCCP_BUILDH=./build-tools/buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
 # xivo-web-interface
+.PHONY : webi.sync
 webi.sync:
 	$(SYNC) $(WEBI_LOCAL_PATH) $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
 
 # xivo-agid
 agi.unittest:
+.PHONY : agi.unittest
 ifdef TARGET_FILE
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(AGI_LOCAL_PATH)
 endif
 
+.PHONY : agi.ctags
 agi.ctags:
 	rm -f $(AGI_TAGS)
 	ctags -o $(AGI_TAGS) -R -e $(AGI_LOCAL_PATH)
 
 # xivo-ctid
+.PHONY : cti.unittest
 cti.unittest:
 ifdef TARGET_FILE
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
@@ -65,10 +69,12 @@ else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(CTI_LOCAL_PATH)
 endif
 
+.PHONY : cti.sync
 cti.sync:
 	$(SYNC) $(CTI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-ctid restart'
 
+.PHONY : cti.ctags
 cti.ctags:
 	rm -f $(CTI_TAGS)
 	ctags -o $(CTI_TAGS) -R -e $(CTI_LOCAL_PATH)
@@ -76,20 +82,25 @@ cti.ctags:
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
 
 # xivo-libsccp
+.PHONY : sccp.sync
 sccp.sync:
 	cd $(SCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) makei
 
+.PHONY : sccp.dep
 sccp.dep:
 	ssh $(XIVO_HOSTNAME) $(XIVO_LIBSCCP_DEP_COMMAND)
 
+.PHONY : sccp.setup
 sccp.setup:
 	cd $(SCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) init
 
+.PHONY : sccp.ctags
 sccp.ctags:
 	rm -f $(SCCP_TAGS)
 	ctags -o $(SCCP_TAGS) -R -e $(SCCP_LOCAL_PATH)
 	ctags -o $(SCCP_TAGS) -R -e -a $(ASTERISK_LOCAL_PATH)
 
+.PHONY : sccp.cscope
 sccp.cscope:
 	rm -f $(SCCP_CSCOPE_FILES)
 	find $(SCCP_LOCAL_PATH) -name "*.c" -o -name "*.h" > $(SCCP_CSCOPE_FILES)
