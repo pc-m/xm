@@ -47,6 +47,11 @@ webi.sync:
 	$(SYNC) $(WEBI_LOCAL_PATH) $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
 
 # xivo-agid
+.PHONY : agi.sync
+agi.sync:
+	$(SYNC) $(AGI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agid restart'
+
 agi.unittest:
 .PHONY : agi.unittest
 ifdef TARGET_FILE
