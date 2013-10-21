@@ -2,6 +2,7 @@
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGI_PATH=$(XIVO_PATH)/xivo-agid
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
+DOC_PATH=$(XIVO_PATH)/xivo-doc
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
 SCCP_PATH=$(XIVO_PATH)/xivo-libsccp
 
@@ -85,6 +86,15 @@ cti.ctags:
 	ctags -o $(CTI_TAGS) -R -e $(CTI_LOCAL_PATH)
 	ctags -o $(CTI_TAGS) -R -e -a $(XIVO_DAO_LOCAL_PATH)
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
+
+# xivo-doc
+.PHONY : doc.build
+doc.build:
+	cd $(DOC_PATH) && make html
+
+.PHONY : doc.clean
+doc.clean:
+	cd $(DOC_PATH) && make clean
 
 # xivo-libsccp
 .PHONY : sccp.sync
