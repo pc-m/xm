@@ -96,6 +96,9 @@ doc.build:
 doc.clean:
 	cd $(DOC_PATH) && make clean
 
+.PHONY : doc.rebuild
+doc.rebuild: doc.clean doc.build
+
 # xivo-libsccp
 .PHONY : sccp.sync
 sccp.sync:
