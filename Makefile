@@ -99,9 +99,18 @@ cti.ctags:
 	ctags -o $(CTI_TAGS) -R -e -a $(XIVO_DAO_LOCAL_PATH)
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
 
+# xivo-dao
 .PHONY : dao.sync
 dao.sync:
 	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+.PHONY : dao.unittest
+dao.unittest:
+ifdef TARGET_FILE
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
+else
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(DAO_LOCAL_PATH)
+endif
 
 # xivo-doc
 .PHONY : doc.build
