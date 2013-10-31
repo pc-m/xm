@@ -2,6 +2,7 @@
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGI_PATH=$(XIVO_PATH)/xivo-agid
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
+DAO_PATH=$(XIVO_PATH)/xivo-dao
 DOC_PATH=$(XIVO_PATH)/xivo-doc
 FETCHFW_PATH=$(XIVO_PATH)/xivo-fetchfw
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
@@ -21,6 +22,7 @@ XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
+DAO_LOCAL_PATH=$(DAO_PATH)/xivo-dao/xivo_dao
 FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo-fetchfw/xivo_fetchfw
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
@@ -51,6 +53,7 @@ XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential auto
 webi.sync:
 	$(SYNC) $(WEBI_LOCAL_PATH) $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
 
+# xivo-fetchfw
 .PHONY : fetchfw.sync
 fetchfw.sync:
 	$(SYNC) $(FETCHFW_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
@@ -95,6 +98,10 @@ cti.ctags:
 	ctags -o $(CTI_TAGS) -R -e $(CTI_LOCAL_PATH)
 	ctags -o $(CTI_TAGS) -R -e -a $(XIVO_DAO_LOCAL_PATH)
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
+
+.PHONY : dao.sync
+dao.sync:
+	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # xivo-doc
 .PHONY : doc.build
