@@ -147,13 +147,13 @@ sccp.cscope:
 	find $(SCCP_LOCAL_PATH) -name "*.c" -o -name "*.h" > $(SCCP_CSCOPE_FILES)
 	find $(ASTERISK_LOCAL_PATH) -name "*.c" -o -name "*.h" >> $(SCCP_CSCOPE_FILES)
 
-.PHONY : asterisk.clean
+# asterisk
+.PHONY : asterisk.clean asterisk.generate asterisk.refresh
+
 asterisk.clean:
 	rm -fr $(ASTERISK_PATH)/asterisk/tmp/
 
-.PHONY : asterisk.generate
 asterisk.generate:
 	$(ASTERISK_PATH)/asterisk/prepare_test_sources.sh
 
-.PHONY : asterisk.refresh
 asterisk.refresh: asterisk.clean asterisk.generate sccp.ctags sccp.cscope
