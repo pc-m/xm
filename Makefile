@@ -28,6 +28,7 @@ LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
 SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
 WEBI_LOCAL_PATH=$(XIVO_PATH)/xivo-web-interface/xivo-web-interface/src/
+UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade/xivo-upgrade
 STARTING_DIR=$(CURDIR)
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 
@@ -146,6 +147,12 @@ sccp.cscope:
 	rm -f $(SCCP_CSCOPE_FILES)
 	find $(SCCP_LOCAL_PATH) -name "*.c" -o -name "*.h" > $(SCCP_CSCOPE_FILES)
 	find $(ASTERISK_LOCAL_PATH) -name "*.c" -o -name "*.h" >> $(SCCP_CSCOPE_FILES)
+
+# xivo-upgrade
+.PHONY : upgrade.sync
+
+upgrade.sync:
+	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
 
 # asterisk
 .PHONY : asterisk.clean asterisk.generate asterisk.refresh
