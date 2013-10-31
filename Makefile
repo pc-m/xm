@@ -60,20 +60,18 @@ fetchfw.sync:
 	$(SYNC) $(FETCHFW_DATA_LOCAL) $(XIVO_HOSTNAME):$(FETCHFW_DATA_PATH)
 
 # xivo-agid
-.PHONY : agi.sync
+.PHONY : agi.sync agi.unittest agi.ctags
 agi.sync:
 	$(SYNC) $(AGI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agid restart'
 
 agi.unittest:
-.PHONY : agi.unittest
 ifdef TARGET_FILE
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(AGI_LOCAL_PATH)
 endif
 
-.PHONY : agi.ctags
 agi.ctags:
 	rm -f $(AGI_TAGS)
 	ctags -o $(AGI_TAGS) -R -e $(AGI_LOCAL_PATH)
