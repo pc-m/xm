@@ -9,6 +9,7 @@ DOC_PATH=$(XIVO_PATH)/xivo-doc
 FETCHFW_PATH=$(XIVO_PATH)/xivo-fetchfw
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
 SCCP_PATH=$(XIVO_PATH)/xivo-libsccp
+SYSCONF_PATH=$(XIVO_PATH)/xivo-sysconfd
 
 # PYTHONPATHS
 LIB_PYTHON_PP=$(LIB_PYTHON_PATH)/xivo-lib-python
@@ -31,6 +32,7 @@ FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo-fetchfw/xivo_fetchfw
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
 SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
+SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo-sysconfd/xivo_sysconf
 WEBI_LOCAL_PATH=$(XIVO_PATH)/xivo-web-interface/xivo-web-interface/src/
 UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade/xivo-upgrade
 STARTING_DIR=$(CURDIR)
@@ -168,6 +170,11 @@ sccp.cscope:
 
 upgrade.sync:
 	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
+
+# xivo-sysconf
+.PHONY : sysconf.sync
+sysconf.sync:
+	$(SYNC) $(SYSCONF_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # asterisk
 .PHONY : asterisk.clean asterisk.generate asterisk.refresh
