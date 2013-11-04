@@ -1,5 +1,6 @@
 # XiVO paths
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
+AGENT_PATH=$(XIVO_PATH)/xivo-agent
 AGI_PATH=$(XIVO_PATH)/xivo-agid
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
@@ -19,6 +20,7 @@ CTI_PP=$(CTI_PATH)/xivo-ctid
 XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):$(XIVO_AGENT_PYTHONPATH):$(XIVO_PROVD_PYTHONPATH):$(CTI_PP)
 
 # Local paths
+AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo-agent/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
@@ -59,6 +61,12 @@ webi.sync:
 fetchfw.sync:
 	$(SYNC) $(FETCHFW_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	$(SYNC) $(FETCHFW_DATA_LOCAL) $(XIVO_HOSTNAME):$(FETCHFW_DATA_PATH)
+
+# xivo-agent
+.PHONY : agent.sync
+agent.sync:
+	$(SYNC) $(AGENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agent restart'
 
 # xivo-agid
 .PHONY : agi.sync agi.unittest agi.ctags
