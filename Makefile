@@ -2,6 +2,7 @@
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGENT_PATH=$(XIVO_PATH)/xivo-agent
 AGI_PATH=$(XIVO_PATH)/xivo-agid
+BUS_PATH=$(XIVO_PATH)/xivo-bus
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
 DOC_PATH=$(XIVO_PATH)/xivo-doc
@@ -23,6 +24,7 @@ XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):
 AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo-agent/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
+BUS_LOCAL_PATH=$(BUS_PATH)/xivo-bus/xivo_bus
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 DAO_LOCAL_PATH=$(DAO_PATH)/xivo-dao/xivo_dao
 FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo-fetchfw/xivo_fetchfw
@@ -84,6 +86,11 @@ endif
 agi.ctags:
 	rm -f $(AGI_TAGS)
 	ctags -o $(AGI_TAGS) -R -e $(AGI_LOCAL_PATH)
+
+# xivo-bus
+.PHONY : bus.sync
+bus.sync:
+	$(SYNC) $(BUS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # xivo-ctid
 .PHONY : cti.unittest
