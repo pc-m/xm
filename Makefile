@@ -98,9 +98,16 @@ agi.ctags:
 	ctags -o $(AGI_TAGS) -R -e $(AGI_LOCAL_PATH)
 
 # xivo-bus
-.PHONY : bus.sync
+.PHONY : bus.sync bus.unittest
 bus.sync:
 	$(SYNC) $(BUS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+bus.unittest:
+ifdef TARGET_FILE
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
+else
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(BUS_LOCAL_PATH)
+endif
 
 # xivo-ctid
 .PHONY : cti.unittest
