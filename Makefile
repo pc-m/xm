@@ -68,10 +68,17 @@ fetchfw.sync:
 	$(SYNC) $(FETCHFW_DATA_LOCAL) $(XIVO_HOSTNAME):$(FETCHFW_DATA_PATH)
 
 # xivo-agent
-.PHONY : agent.sync
+.PHONY : agent.sync agent.unittest
 agent.sync:
 	$(SYNC) $(AGENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agent restart'
+
+agent.unittest:
+ifdef TARGET_FILE
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
+else
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(AGENT_LOCAL_PATH)
+endif
 
 # xivo-agid
 .PHONY : agi.sync agi.unittest agi.ctags
