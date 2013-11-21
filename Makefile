@@ -8,6 +8,7 @@ DAO_PATH=$(XIVO_PATH)/xivo-dao
 DOC_PATH=$(XIVO_PATH)/xivo-doc
 FETCHFW_PATH=$(XIVO_PATH)/xivo-fetchfw
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
+RESTAPI_PATH=$(XIVO_PATH)/xivo-restapi
 SCCP_PATH=$(XIVO_PATH)/xivo-libsccp
 SYSCONF_PATH=$(XIVO_PATH)/xivo-sysconfd
 
@@ -36,6 +37,7 @@ SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
 SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo-sysconfd/xivo_sysconf
 WEBI_LOCAL_PATH=$(XIVO_PATH)/xivo-web-interface/xivo-web-interface/src/
 UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade/xivo-upgrade
+RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo-restapi/xivo_restapi
 STARTING_DIR=$(CURDIR)
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 
@@ -185,6 +187,17 @@ sccp.cscope:
 
 upgrade.sync:
 	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
+
+# xivo-restapi
+.PHONY : restapi.unittest
+
+restapi.unittest:
+ifdef TARGET_FILE
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
+else
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(RESTAPI_LOCAL_PATH)
+endif
+
 
 # xivo-sysconf
 .PHONY : sysconf.sync
