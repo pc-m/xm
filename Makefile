@@ -5,6 +5,7 @@ AGI_PATH=$(XIVO_PATH)/xivo-agid
 BUS_PATH=$(XIVO_PATH)/xivo-bus
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
+DIRD_PATH=$(XIVO_PATH)/xivo-dird
 DOC_PATH=$(XIVO_PATH)/xivo-doc
 FETCHFW_PATH=$(XIVO_PATH)/xivo-fetchfw
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
@@ -30,6 +31,7 @@ ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PA
 BUS_LOCAL_PATH=$(BUS_PATH)/xivo-bus/xivo_bus
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 DAO_LOCAL_PATH=$(DAO_PATH)/xivo-dao/xivo_dao
+DIRD_LOCAL_PATH=$(DIRD_PATH)/xivo-dird/xivo_dird
 FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo-fetchfw/xivo_fetchfw
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
@@ -144,6 +146,11 @@ ifdef TARGET_FILE
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(DAO_LOCAL_PATH)
 endif
+
+# xivo-dird
+.PHONY : dird.sync
+dird.sync:
+	$(SYNC) $(DIRD_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # xivo-doc
 .PHONY : doc.build
