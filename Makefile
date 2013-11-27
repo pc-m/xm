@@ -3,6 +3,7 @@ ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGENT_PATH=$(XIVO_PATH)/xivo-agent
 AGI_PATH=$(XIVO_PATH)/xivo-agid
 BUS_PATH=$(XIVO_PATH)/xivo-bus
+CONFGEN_PATH=$(XIVO_PATH)/xivo-confgen
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
 DIRD_PATH=$(XIVO_PATH)/xivo-dird
@@ -29,6 +30,7 @@ AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo-agent/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 BUS_LOCAL_PATH=$(BUS_PATH)/xivo-bus/xivo_bus
+CONFGEN_LOCAL_PATH=$(CONFGEN_PATH)/xivo-confgen/xivo_confgen
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 DAO_LOCAL_PATH=$(DAO_PATH)/xivo-dao/xivo_dao
 DIRD_LOCAL_PATH=$(DIRD_PATH)/xivo-dird/xivo_dird
@@ -112,6 +114,13 @@ ifdef TARGET_FILE
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(BUS_LOCAL_PATH)
 endif
+
+# xivo-confgen
+.PHONY : confgen.sync
+confgen.sync:
+	$(SYNC) $(CONFGEN_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-confgend restart'
+
 
 # xivo-ctid
 .PHONY : cti.unittest
