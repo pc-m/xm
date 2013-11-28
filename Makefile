@@ -1,3 +1,5 @@
+STARTING_DIR=$(CURDIR)
+
 # XiVO paths
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGENT_PATH=$(XIVO_PATH)/xivo-agent
@@ -13,6 +15,7 @@ LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
 RESTAPI_PATH=$(XIVO_PATH)/xivo-restapi
 SCCP_PATH=$(XIVO_PATH)/xivo-libsccp
 SYSCONF_PATH=$(XIVO_PATH)/xivo-sysconfd
+WEBI_PATH=$(XIVO_PATH)/xivo-web-interface
 
 # PYTHONPATHS
 LIB_PYTHON_PP=$(LIB_PYTHON_PATH)/xivo-lib-python
@@ -42,8 +45,8 @@ SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo-sysconfd/xivo_sysconf
 WEBI_LOCAL_PATH=$(XIVO_PATH)/xivo-web-interface/xivo-web-interface/src/
 UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade/xivo-upgrade
 RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo-restapi/xivo_restapi
-STARTING_DIR=$(CURDIR)
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
+WEBI_LOCAL_PATH=$(WEBI_PATH)/xivo-web-interface/src
 
 # Remote paths
 PYTHON_PACKAGES=/usr/lib/pymodules/python2.6
@@ -54,6 +57,7 @@ FETCHFW_DATA_PATH=/var/lib/xivo-fetchfw/installable
 CTI_TAGS=$(CTI_PATH)/TAGS
 AGI_TAGS=$(AGI_PATH)/TAGS
 SCCP_TAGS=$(SCCP_PATH)/TAGS
+WEBI_TAGS=$(WEBI_PATH)/TAGS
 
 SCCP_CSCOPE_FILES=$(SCCP_PATH)/cscope.files
 
@@ -63,7 +67,11 @@ XIVO_LIBSCCP_BUILDH=./build-tools/buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
 # xivo-web-interface
-.PHONY : webi.sync
+.PHONY : webi.sync webi.ctags
+webi.ctags:
+	rm -f $(WEBI_TAGS)
+	ctags -o $(WEBI_TAGS) -R -e --langmap=php:.php.inc $(WEBI_LOCAL_PATH)
+
 webi.sync:
 	$(SYNC) $(WEBI_LOCAL_PATH) $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
 
