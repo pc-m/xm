@@ -42,7 +42,6 @@ LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
 SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
 SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo-sysconfd/xivo_sysconf
-WEBI_LOCAL_PATH=$(XIVO_PATH)/xivo-web-interface/xivo-web-interface/src/
 UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade/xivo-upgrade
 RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo-restapi/xivo_restapi
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
@@ -73,7 +72,7 @@ webi.ctags:
 	ctags -o $(WEBI_TAGS) -R -e --langmap=php:.php.inc $(WEBI_LOCAL_PATH)
 
 webi.sync:
-	$(SYNC) $(WEBI_LOCAL_PATH) $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
+	$(SYNC) $(WEBI_LOCAL_PATH)/ $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
 
 # xivo-fetchfw
 .PHONY : fetchfw.sync
