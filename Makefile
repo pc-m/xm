@@ -205,6 +205,11 @@ sccp.cscope:
 	find $(SCCP_LOCAL_PATH) -name "*.c" -o -name "*.h" > $(SCCP_CSCOPE_FILES)
 	find $(ASTERISK_LOCAL_PATH) -name "*.c" -o -name "*.h" >> $(SCCP_CSCOPE_FILES)
 
+# xivo-provd
+.PHONY : provd.sync
+provd.sync:
+	$(SYNC) $(XIVO_PROVD_PYTHONPATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
 # xivo-upgrade
 .PHONY : upgrade.sync
 
