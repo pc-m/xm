@@ -5,6 +5,7 @@ ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGENT_PATH=$(XIVO_PATH)/xivo-agent
 AGI_PATH=$(XIVO_PATH)/xivo-agid
 BUS_PATH=$(XIVO_PATH)/xivo-bus
+CALL_LOGS_PATH=$(XIVO_PATH)/xivo-call-logs
 CONFGEN_PATH=$(XIVO_PATH)/xivo-confgen
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
@@ -33,6 +34,7 @@ AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo-agent/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 BUS_LOCAL_PATH=$(BUS_PATH)/xivo-bus/xivo_bus
+CALL_LOGS_LOCAL_PATH=$(CALL_LOGS_PATH)/xivo-call-logs/xivo_call_logs
 CONFGEN_LOCAL_PATH=$(CONFGEN_PATH)/xivo-confgen/xivo_confgen
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 DAO_LOCAL_PATH=$(DAO_PATH)/xivo-dao/xivo_dao
@@ -121,6 +123,11 @@ ifdef TARGET_FILE
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(BUS_LOCAL_PATH)
 endif
+
+# xivo-call-logs
+.PHONE : call-logs.sync
+call-logs.sync:
+	$(SYNC) $(CALL_LOGS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # xivo-confgen
 .PHONY : confgen.sync
