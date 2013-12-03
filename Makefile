@@ -187,6 +187,11 @@ doc.clean:
 .PHONY : doc.rebuild
 doc.rebuild: doc.clean doc.build
 
+# xivo-lib-python
+.PHONY : lib-python.sync
+lib-python.sync:
+	$(SYNC) $(LIB_PYTHON_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
 # xivo-libsccp
 .PHONY : sccp.sync
 sccp.sync:
