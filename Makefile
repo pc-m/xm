@@ -229,7 +229,7 @@ upgrade.sync:
 	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
 
 # xivo-restapi
-.PHONY : restapi.unittest restapi.sync
+.PHONY : restapi.unittest restapi.sync restapi.functest
 
 restapi.sync:
 	$(SYNC) $(RESTAPI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
@@ -240,6 +240,9 @@ ifdef TARGET_FILE
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(RESTAPI_LOCAL_PATH)
 endif
+
+restapi.functest:
+	PYTHONPATH=$(XIVO_PYTHONPATH):$(XIVO_PATH)/xivo-acceptance:$(XIVO_PATH)/xivo-ws lettuce -v3 ~/d/xivo-restapi/xivo-restapi/acceptance
 
 
 # xivo-sysconf
