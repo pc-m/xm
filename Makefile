@@ -229,7 +229,10 @@ upgrade.sync:
 	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
 
 # xivo-restapi
-.PHONY : restapi.unittest
+.PHONY : restapi.unittest restapi.sync
+
+restapi.sync:
+	$(SYNC) $(RESTAPI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 restapi.unittest:
 ifdef TARGET_FILE
