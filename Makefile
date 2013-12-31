@@ -50,7 +50,7 @@ FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 WEBI_LOCAL_PATH=$(WEBI_PATH)/xivo-web-interface/src
 
 # Remote paths
-PYTHON_PACKAGES=/usr/lib/pymodules/python2.6
+PYTHON_PACKAGES=/usr/lib/pymodules/python2.7
 WEBI_REMOTE_PATH=/usr/share/xivo-web-interface
 FETCHFW_DATA_PATH=/var/lib/xivo-fetchfw/installable
 
