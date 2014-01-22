@@ -55,8 +55,9 @@ WEBI_REMOTE_PATH=/usr/share/xivo-web-interface
 FETCHFW_DATA_PATH=/var/lib/xivo-fetchfw/installable
 
 # Tags
-CTI_TAGS=$(CTI_PATH)/TAGS
 AGI_TAGS=$(AGI_PATH)/TAGS
+CTI_TAGS=$(CTI_PATH)/TAGS
+DAO_TAGS=$(DAO_PATH)/TAGS
 SCCP_TAGS=$(SCCP_PATH)/TAGS
 WEBI_TAGS=$(WEBI_PATH)/TAGS
 
@@ -158,7 +159,7 @@ cti.ctags:
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
 
 # xivo-dao
-.PHONY : dao.sync
+.PHONY : dao.sync dao.unittest dao.ctags
 dao.sync:
 	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
@@ -169,6 +170,10 @@ ifdef TARGET_FILE
 else
 	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(DAO_LOCAL_PATH)
 endif
+
+dao.ctags:
+	rm -f $(DAO_TAGS)
+	ctags -o $(DAO_TAGS) -R -e $(DAO_LOCAL_PATH)
 
 # xivo-dird
 .PHONY : dird.sync
