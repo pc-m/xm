@@ -7,6 +7,7 @@ AGI_PATH=$(XIVO_PATH)/xivo-agid
 BUS_PATH=$(XIVO_PATH)/xivo-bus
 CALL_LOGS_PATH=$(XIVO_PATH)/xivo-call-logs
 CONFGEN_PATH=$(XIVO_PATH)/xivo-confgen
+CONFIG_PATH=$(XIVO_PATH)/xivo-config
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
 DIRD_PATH=$(XIVO_PATH)/xivo-dird
@@ -38,6 +39,7 @@ CALL_LOGS_LOCAL_PATH=$(CALL_LOGS_PATH)/xivo-call-logs/xivo_call_logs
 CONFGEN_LOCAL_PATH=$(CONFGEN_PATH)/xivo-confgen/xivo_confgen
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
 DAO_LOCAL_PATH=$(DAO_PATH)/xivo-dao/xivo_dao
+DIALPLAN_LOCAL_PATH=$(CONFIG_PATH)/xivo-config/dialplan/asterisk
 DIRD_LOCAL_PATH=$(DIRD_PATH)/xivo-dird/xivo_dird
 FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo-fetchfw/xivo_fetchfw
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
@@ -50,9 +52,10 @@ FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 WEBI_LOCAL_PATH=$(WEBI_PATH)/xivo-web-interface/src
 
 # Remote paths
-PYTHON_PACKAGES=/usr/lib/pymodules/python2.7
+PYTHON_PACKAGES=/usr/lib/python2.7/dist-packages/
 WEBI_REMOTE_PATH=/usr/share/xivo-web-interface
 FETCHFW_DATA_PATH=/var/lib/xivo-fetchfw/installable
+DIALPLAN_REMOTE_PATH=/usr/share/xivo-config/dialplan/asterisk
 
 # Tags
 AGI_TAGS=$(AGI_PATH)/TAGS
@@ -265,3 +268,14 @@ asterisk.generate:
 	$(ASTERISK_PATH)/asterisk/prepare_test_sources.sh
 
 asterisk.refresh: asterisk.clean asterisk.generate sccp.ctags sccp.cscope
+
+# dialplan
+.PHONY : dialplan.sync dialplan.reload dialplan.copy
+
+dialplan.sync: dialplan.copy dialplan.reload
+
+dialplan.copy:
+	$(SYNC) $(DIALPLAN_LOCAL_PATH)/ $(XIVO_HOSTNAME):$(DIALPLAN_REMOTE_PATH)
+
+dialplan.reload:
+	ssh $(XIVO_HOSTNAME) 'asterisk -rx "dialplan reload"'
