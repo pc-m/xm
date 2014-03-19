@@ -20,34 +20,34 @@ SYSCONF_PATH=$(XIVO_PATH)/xivo-sysconfd
 WEBI_PATH=$(XIVO_PATH)/xivo-web-interface
 
 # PYTHONPATHS
-LIB_PYTHON_PP=$(LIB_PYTHON_PATH)/xivo-lib-python
-BUS_PP=$(BUS_PATH)/xivo-bus
-XIVO_DAO_PYTHONPATH=$(XIVO_PATH)/xivo-dao/xivo-dao
-XIVO_DIRD_PYTHONPATH=$(XIVO_PATH)/xivo-dird/xivo-dird
-XIVO_AGENT_PYTHONPATH=$(XIVO_PATH)/xivo-agent/xivo-agent
-XIVO_PROVD_PYTHONPATH=$(XIVO_PATH)/xivo-provisioning/xivo-provisioning/src
-CTI_PP=$(CTI_PATH)/xivo-ctid
+LIB_PYTHON_PP=$(LIB_PYTHON_PATH)
+BUS_PP=$(BUS_PATH)
+XIVO_DAO_PYTHONPATH=$(XIVO_PATH)/xivo-dao
+XIVO_DIRD_PYTHONPATH=$(XIVO_PATH)/xivo-dird
+XIVO_AGENT_PYTHONPATH=$(XIVO_PATH)/xivo-agent
+XIVO_PROVD_PYTHONPATH=$(XIVO_PATH)/xivo-provisioning/src
+CTI_PP=$(CTI_PATH)
 
 XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):$(XIVO_AGENT_PYTHONPATH):$(XIVO_PROVD_PYTHONPATH):$(CTI_PP):$(BUS_PP)
 
 # Local paths
-AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo-agent/xivo_agent
-AGI_LOCAL_PATH=$(AGI_PATH)/xivo-agid/xivo_agid
+AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo_agent
+AGI_LOCAL_PATH=$(AGI_PATH)/xivo_agid
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
-BUS_LOCAL_PATH=$(BUS_PATH)/xivo-bus/xivo_bus
-CALL_LOGS_LOCAL_PATH=$(CALL_LOGS_PATH)/xivo-call-logs/xivo_call_logs
-CONFGEN_LOCAL_PATH=$(CONFGEN_PATH)/xivo-confgen/xivo_confgen
-CTI_LOCAL_PATH=$(CTI_PATH)/xivo-ctid/xivo_cti
-DAO_LOCAL_PATH=$(DAO_PATH)/xivo-dao/xivo_dao
-DIALPLAN_LOCAL_PATH=$(CONFIG_PATH)/xivo-config/dialplan/asterisk
-DIRD_LOCAL_PATH=$(DIRD_PATH)/xivo-dird/xivo_dird
-FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo-fetchfw/xivo_fetchfw
-LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo-lib-python/xivo
+BUS_LOCAL_PATH=$(BUS_PATH)/xivo_bus
+CALL_LOGS_LOCAL_PATH=$(CALL_LOGS_PATH)/xivo_call_logs
+CONFGEN_LOCAL_PATH=$(CONFGEN_PATH)/xivo_confgen
+CTI_LOCAL_PATH=$(CTI_PATH)/xivo_cti
+DAO_LOCAL_PATH=$(DAO_PATH)/xivo_dao
+DIALPLAN_LOCAL_PATH=$(CONFIG_PATH)/dialplan/asterisk
+DIRD_LOCAL_PATH=$(DIRD_PATH)/xivo_dird
+FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo_fetchfw
+LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
 SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
-SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo-sysconfd/xivo_sysconf
-UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade/xivo-upgrade
-RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo-restapi/xivo_restapi
+SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo_sysconf
+UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade
+RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo_restapi
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 WEBI_LOCAL_PATH=$(WEBI_PATH)/xivo-web-interface/src
 
