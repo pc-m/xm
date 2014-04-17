@@ -33,6 +33,7 @@ XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):
 # Local paths
 AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo_agid
+AMID_LOCAL_PATH=$(XIVO_PATH)/xivo-amid/xivo_ami
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 BUS_LOCAL_PATH=$(BUS_PATH)/xivo_bus
 CALL_LOGS_LOCAL_PATH=$(CALL_LOGS_PATH)/xivo_call_logs
@@ -115,6 +116,11 @@ endif
 agi.ctags:
 	rm -f $(AGI_TAGS)
 	ctags -o $(AGI_TAGS) -R -e $(AGI_LOCAL_PATH)
+
+# xivo-amid
+.PHONY : amid.sync
+amid.sync:
+	$(SYNC) $(AMID_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # xivo-bus
 .PHONY : bus.sync bus.unittest
