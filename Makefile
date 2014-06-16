@@ -46,11 +46,12 @@ FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo_fetchfw
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
 SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
+STAT_LOCAL_PATH=$(XIVO_PATH)/xivo-stat
 SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo_sysconf
 UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade
 RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo_restapi
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
-WEBI_LOCAL_PATH=$(WEBI_PATH)/xivo-web-interface/src
+WEBI_LOCAL_PATH=$(WEBI_PATH)/src
 
 # Remote paths
 PYTHON_PACKAGES=/usr/lib/python2.7/dist-packages/
@@ -69,7 +70,7 @@ SCCP_CSCOPE_FILES=$(SCCP_PATH)/cscope.files
 
 # Commands
 SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
-XIVO_LIBSCCP_BUILDH=./build-tools/buildh
+XIVO_LIBSCCP_BUILDH=./buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
 # xivo-web-interface
@@ -263,6 +264,11 @@ restapi.functest:
 .PHONY : sysconf.sync
 sysconf.sync:
 	$(SYNC) $(SYSCONF_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+# xivo-stat
+.PHONY : stat.sync
+stat.sync:
+	$(SYNC) $(STAT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # asterisk
 .PHONY : asterisk.clean asterisk.generate asterisk.refresh
