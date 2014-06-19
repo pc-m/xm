@@ -33,6 +33,7 @@ XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):
 # Local paths
 AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo_agid
+ALEMBIC_LOCAL_PATH=$(XIVO_PATH)/xivo-manage-db/alembic/versions
 AMID_LOCAL_PATH=$(XIVO_PATH)/xivo-amid/xivo_ami
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 BUS_LOCAL_PATH=$(BUS_PATH)/xivo_bus
@@ -54,6 +55,7 @@ FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 WEBI_LOCAL_PATH=$(WEBI_PATH)/src
 
 # Remote paths
+ALEMBIC_REMOTE_PATH=/usr/share/xivo-manage-db/alembic/versions
 PYTHON_PACKAGES=/usr/lib/python2.7/dist-packages/
 WEBI_REMOTE_PATH=/usr/share/xivo-web-interface
 FETCHFW_DATA_PATH=/var/lib/xivo-fetchfw/installable
@@ -185,6 +187,11 @@ dao.ctags:
 	rm -f $(DAO_TAGS)
 	ctags -o $(DAO_TAGS) -R -e $(DAO_LOCAL_PATH)
 
+# xivo-manage-db
+.PHONY : db.sync
+db.sync:
+	$(SYNC) $(ALEMBIC_LOCAL_PATH)/* $(XIVO_HOSTNAME):$(ALEMBIC_REMOTE_PATH)/
+
 # xivo-dird
 .PHONY : dird.sync
 dird.sync:
@@ -272,7 +279,6 @@ stat.sync:
 
 # asterisk
 .PHONY : asterisk.clean asterisk.generate asterisk.refresh
-
 asterisk.clean:
 	rm -fr $(ASTERISK_PATH)/asterisk/tmp/
 
