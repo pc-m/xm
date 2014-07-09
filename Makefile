@@ -242,7 +242,7 @@ sccp.cscope:
 # xivo-provd
 .PHONY : provd.sync
 provd.sync:
-	$(SYNC) $(XIVO_PROVD_PYTHONPATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	$(SYNC) $(XIVO_PROVD_PYTHONPATH)/provd $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # xivo-upgrade
 .PHONY : upgrade.sync
