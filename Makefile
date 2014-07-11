@@ -196,6 +196,8 @@ db.sync:
 .PHONY : dird.sync
 dird.sync:
 	$(SYNC) $(DIRD_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	$(SYNC) $(DIRD_PATH)/debian/xivo-dird.init $(XIVO_HOSTNAME):/etc/init.d/xivo-dird
+	ssh $(XIVO_HOSTNAME) chmod a+x /etc/init.d/xivo-dird
 
 # xivo-doc
 .PHONY : doc.build
