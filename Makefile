@@ -63,11 +63,13 @@ DIALPLAN_REMOTE_PATH=/usr/share/xivo-config/dialplan/asterisk
 
 # Tags
 AGI_TAGS=$(AGI_PATH)/TAGS
+ASTERISK_TAGS=$(ASTERISK_PATH)/TAGS
 CTI_TAGS=$(CTI_PATH)/TAGS
 DAO_TAGS=$(DAO_PATH)/TAGS
 SCCP_TAGS=$(SCCP_PATH)/TAGS
 WEBI_TAGS=$(WEBI_PATH)/TAGS
 
+ASTERISK_CSCOPE_FILES=$(ASTERISK_PATH)/cscope.files
 SCCP_CSCOPE_FILES=$(SCCP_PATH)/cscope.files
 
 # Commands
@@ -161,7 +163,6 @@ endif
 .PHONY : cti.sync
 cti.sync:
 	$(SYNC) $(CTI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-ctid restart'
 
 .PHONY : cti.ctags
 cti.ctags:
@@ -280,9 +281,17 @@ stat.sync:
 	$(SYNC) $(STAT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # asterisk
-.PHONY : asterisk.clean asterisk.generate asterisk.refresh
+.PHONY : asterisk.clean asterisk.generate asterisk.refresh asterisk.ctags asterisk.cscope
 asterisk.clean:
 	rm -fr $(ASTERISK_PATH)/asterisk/tmp/
+
+asterisk.ctags:
+	rm -f $(ASTERISK_TAGS)
+	ctags -o $(ASTERISK_TAGS) -R -e -a $(ASTERISK_LOCAL_PATH)
+
+asterisk.cscope:
+	rm -f $(ASTERISK_CSCOPE_FILES)
+	find $(ASTERISK_LOCAL_PATH) -name "*.c" -o -name "*.h" >> $(ASTERISK_CSCOPE_FILES)
 
 asterisk.generate:
 	$(ASTERISK_PATH)/asterisk/prepare_test_sources.sh
