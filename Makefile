@@ -4,6 +4,7 @@ STARTING_DIR=$(CURDIR)
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGENT_PATH=$(XIVO_PATH)/xivo-agent
 AGI_PATH=$(XIVO_PATH)/xivo-agid
+BACKUP_PATH=$(XIVO_PATH)/xivo-backup
 BUS_PATH=$(XIVO_PATH)/xivo-bus
 CALL_LOGS_PATH=$(XIVO_PATH)/xivo-call-logs
 CONFGEN_PATH=$(XIVO_PATH)/xivo-confgen
@@ -126,6 +127,11 @@ agi.ctags:
 .PHONY : amid.sync
 amid.sync:
 	$(SYNC) $(AMID_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+# xivo-backup
+.PHONE : backup.sync
+backup.sync:
+	$(SYNC) $(BACKUP_PATH)/bin/ $(XIVO_HOSTNAME):/usr/sbin
 
 # xivo-bus
 .PHONY : bus.sync bus.unittest
