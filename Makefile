@@ -19,6 +19,7 @@ RESTAPI_PATH=$(XIVO_PATH)/xivo-restapi
 SCCP_PATH=$(XIVO_PATH)/xivo-libsccp
 SYSCONF_PATH=$(XIVO_PATH)/xivo-sysconfd
 WEBI_PATH=$(XIVO_PATH)/xivo-web-interface
+LIB_REST_CLIENT_PATH=$(XIVO_PATH)/xivo-lib-rest-client
 
 # PYTHONPATHS
 LIB_PYTHON_PP=$(LIB_PYTHON_PATH)
@@ -54,6 +55,7 @@ UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade
 RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo_restapi
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 WEBI_LOCAL_PATH=$(WEBI_PATH)/src
+LIB_REST_CLIENT_LOCAL_PATH=$(LIB_REST_CLIENT_PATH)/xivo_lib_rest_client
 
 # Remote paths
 ALEMBIC_REMOTE_PATH=/usr/share/xivo-manage-db/alembic/versions
@@ -314,3 +316,8 @@ dialplan.copy:
 
 dialplan.reload:
 	ssh $(XIVO_HOSTNAME) 'asterisk -rx "dialplan reload"'
+
+
+.PHONY : lib-rest-client.sync
+lib-rest-client.sync:
+	$(SYNC) $(LIB_REST_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
