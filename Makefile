@@ -15,7 +15,7 @@ DIRD_PATH=$(XIVO_PATH)/xivo-dird
 DOC_PATH=$(XIVO_PATH)/xivo-doc
 FETCHFW_PATH=$(XIVO_PATH)/xivo-fetchfw
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
-RESTAPI_PATH=$(XIVO_PATH)/xivo-restapi
+CONFD_PATH=$(XIVO_PATH)/xivo-confd
 SCCP_PATH=$(XIVO_PATH)/xivo-libsccp
 SYSCONF_PATH=$(XIVO_PATH)/xivo-sysconfd
 WEBI_PATH=$(XIVO_PATH)/xivo-web-interface
@@ -52,7 +52,7 @@ SCCP_LOCAL_PATH=$(XIVO_PATH)/xivo-libsccp
 STAT_LOCAL_PATH=$(XIVO_PATH)/xivo-stat
 SYSCONF_LOCAL_PATH=$(SYSCONF_PATH)/xivo_sysconf
 UPGRADE_LOCAL_PATH=$(XIVO_PATH)/xivo-upgrade
-RESTAPI_LOCAL_PATH=$(RESTAPI_PATH)/xivo_restapi
+CONFD_LOCAL_PATH=$(CONFD_PATH)/xivo_confd
 FETCHFW_DATA_LOCAL=$(FETCHFW_PATH)/xivo-fetchfw/resources/data/
 WEBI_LOCAL_PATH=$(WEBI_PATH)/src
 LIB_REST_CLIENT_LOCAL_PATH=$(LIB_REST_CLIENT_PATH)/xivo_lib_rest_client
@@ -261,21 +261,14 @@ provd.sync:
 upgrade.sync:
 	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
 
-# xivo-restapi
-.PHONY : restapi.unittest restapi.sync restapi.functest
+# xivo-confd
+.PHONY : confd.sync confd.functest
 
-restapi.sync:
-	$(SYNC) $(RESTAPI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+confd.sync:
+	$(SYNC) $(CONFD_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
-restapi.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(RESTAPI_LOCAL_PATH)
-endif
-
-restapi.functest:
-	PYTHONPATH=$(XIVO_PYTHONPATH):$(XIVO_PATH)/xivo-acceptance:$(XIVO_PATH)/xivo-ws lettuce -v3 ~/d/xivo-restapi/xivo-restapi/acceptance
+confd.functest:
+	PYTHONPATH=$(XIVO_PYTHONPATH):$(XIVO_PATH)/xivo-acceptance:$(XIVO_PATH)/xivo-ws lettuce -v3 ~/d/xivo-confd/xivo-confd/acceptance
 
 
 # xivo-sysconf
