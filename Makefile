@@ -96,30 +96,16 @@ fetchfw.sync:
 	$(SYNC) $(FETCHFW_DATA_LOCAL) $(XIVO_HOSTNAME):$(FETCHFW_DATA_PATH)
 
 # xivo-agent
-.PHONY : agent.sync agent.unittest
+.PHONY : agent.sync
 agent.sync:
 	$(SYNC) $(AGENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agent restart'
 
-agent.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(AGENT_LOCAL_PATH)
-endif
-
 # xivo-agid
-.PHONY : agi.sync agi.unittest agi.ctags
+.PHONY : agi.sync agi.ctags
 agi.sync:
 	$(SYNC) $(AGI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agid restart'
-
-agi.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(AGI_LOCAL_PATH)
-endif
 
 agi.ctags:
 	rm -f $(AGI_TAGS)
@@ -136,16 +122,9 @@ backup.sync:
 	$(SYNC) $(BACKUP_PATH)/bin/ $(XIVO_HOSTNAME):/usr/sbin
 
 # xivo-bus
-.PHONY : bus.sync bus.unittest
+.PHONY : bus.sync
 bus.sync:
 	$(SYNC) $(BUS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-
-bus.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(BUS_LOCAL_PATH)
-endif
 
 # xivo-call-logs
 .PHONE : call-logs.sync
@@ -160,14 +139,6 @@ confgen.sync:
 
 
 # xivo-ctid
-.PHONY : cti.unittest
-cti.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(CTI_LOCAL_PATH)
-endif
-
 .PHONY : cti.sync
 cti.sync:
 	$(SYNC) $(CTI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
@@ -180,17 +151,9 @@ cti.ctags:
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
 
 # xivo-dao
-.PHONY : dao.sync dao.unittest dao.ctags
+.PHONY : dao.sync dao.ctags
 dao.sync:
 	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-
-.PHONY : dao.unittest
-dao.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(DAO_LOCAL_PATH)
-endif
 
 dao.ctags:
 	rm -f $(DAO_TAGS)
