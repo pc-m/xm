@@ -139,6 +139,14 @@ confgen.sync:
 
 
 # xivo-ctid
+.PHONY : cti.unittest
+cti.unittest:
+ifdef TARGET_FILE
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
+else
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(CTI_LOCAL_PATH)
+endif
+
 .PHONY : cti.sync
 cti.sync:
 	$(SYNC) $(CTI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
@@ -151,9 +159,17 @@ cti.ctags:
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
 
 # xivo-dao
-.PHONY : dao.sync dao.ctags
+.PHONY : dao.sync dao.unittest dao.ctags
 dao.sync:
 	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+.PHONY : dao.unittest
+dao.unittest:
+ifdef TARGET_FILE
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
+else
+	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(DAO_LOCAL_PATH)
+endif
 
 dao.ctags:
 	rm -f $(DAO_TAGS)

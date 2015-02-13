@@ -19,16 +19,6 @@ alias xm='make -f ~/dev/xm/Makefile XIVO_HOSTNAME=xivo-dev XIVO_PATH=~/dev/xivo'
 ```
 
 
-### Running xivo-ctid unit-tests
-
-```
-make -f <path/to/xm>/Makefile cti.unittest XIVO_PATH=<path/to/xivo/source/code> [TARGET_FILE=<file>]
-```
-
-If the TARGET_FILE argument is supplied, the test runner will be run on the specified file
-or directory only.
-
-
 ### Syncing the local copy of xivo-ctid to a remote XiVO
 
 ```
