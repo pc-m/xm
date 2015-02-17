@@ -1,5 +1,3 @@
-STARTING_DIR=$(CURDIR)
-
 # XiVO paths
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGENT_PATH=$(XIVO_PATH)/xivo-agent
@@ -12,6 +10,7 @@ CONFIG_PATH=$(XIVO_PATH)/xivo-config
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
 DIRD_PATH=$(XIVO_PATH)/xivo-dird
+DIRD_CLIENT_PATH=$(XIVO_PATH)/xivo-dird-client
 DOC_PATH=$(XIVO_PATH)/xivo-doc
 FETCHFW_PATH=$(XIVO_PATH)/xivo-fetchfw
 LIB_PYTHON_PATH=$(XIVO_PATH)/xivo-lib-python
@@ -45,6 +44,7 @@ CTI_LOCAL_PATH=$(CTI_PATH)/xivo_cti
 DAO_LOCAL_PATH=$(DAO_PATH)/xivo_dao
 DIALPLAN_LOCAL_PATH=$(CONFIG_PATH)/dialplan/asterisk
 DIRD_LOCAL_PATH=$(DIRD_PATH)/xivo_dird
+DIRD_CLIENT_LOCAL_PATH=$(DIRD_CLIENT_PATH)/xivo_dird_client
 FETCHFW_LOCAL_PATH=$(FETCHFW_PATH)/xivo_fetchfw
 LIB_PYTHON_LOCAL_PATH=$(LIB_PYTHON_PATH)/xivo
 XIVO_DAO_LOCAL_PATH=$(XIVO_DAO_PYTHONPATH)/xivo_dao
@@ -293,3 +293,8 @@ dialplan.reload:
 .PHONY : lib-rest-client.sync
 lib-rest-client.sync:
 	$(SYNC) $(LIB_REST_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+
+.PHONY : dird-client.sync
+dird-client.sync:
+	$(SYNC) $(DIRD_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
