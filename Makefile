@@ -1,11 +1,12 @@
 # XiVO paths
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
-AGENT_PATH=$(XIVO_PATH)/xivo-agent
+AGENT_PATH=$(XIVO_PATH)/xivo-agentd
 AGI_PATH=$(XIVO_PATH)/xivo-agid
 BACKUP_PATH=$(XIVO_PATH)/xivo-backup
 BUS_PATH=$(XIVO_PATH)/xivo-bus
 CALL_LOGS_PATH=$(XIVO_PATH)/xivo-call-logs
-CONFGEN_PATH=$(XIVO_PATH)/xivo-confgen
+CONFGEN_PATH=$(XIVO_PATH)/xivo-confgend
+CONFD_CLIENT_PATH=$(XIVO_PATH)/xivo-confd-client
 CONFIG_PATH=$(XIVO_PATH)/xivo-config
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
@@ -36,11 +37,13 @@ AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo_agid
 ALEMBIC_LOCAL_PATH=$(XIVO_PATH)/xivo-manage-db/alembic/versions
 AMID_LOCAL_PATH=$(XIVO_PATH)/xivo-amid/xivo_ami
+AUTH_LOCAL_PATH=$(XIVO_PATH)/xivo-auth/xivo_auth
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 BUS_LOCAL_PATH=$(BUS_PATH)/xivo_bus
 CALL_LOGS_LOCAL_PATH=$(CALL_LOGS_PATH)/xivo_call_logs
 CONFGEN_LOCAL_PATH=$(CONFGEN_PATH)/xivo_confgen
 CTI_LOCAL_PATH=$(CTI_PATH)/xivo_cti
+CONFD_CLIENT_LOCAL_PATH=$(CONFD_CLIENT_PATH)/xivo_confd_client
 DAO_LOCAL_PATH=$(DAO_PATH)/xivo_dao
 DIALPLAN_LOCAL_PATH=$(CONFIG_PATH)/dialplan/asterisk
 DIRD_LOCAL_PATH=$(DIRD_PATH)/xivo_dird
@@ -80,6 +83,14 @@ SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
 XIVO_LIBSCCP_BUILDH=./buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
+# xivo-auth
+.PHONE : auth.sync
+auth.sync:
+	$(SYNC) --delete $(XIVO_PATH)/xivo-auth $(XIVO_HOSTNAME):/tmp
+	$(SYNC) $(XIVO_PATH)/xivo-auth/bin/xivo-auth $(XIVO_HOSTNAME):/usr/bin/
+	$(SYNC) $(XIVO_PATH)/xivo-auth/etc/xivo-auth/ $(XIVO_HOSTNAME):/etc/xivo-auth
+	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-auth && python setup.py develop'
+
 # xivo-web-interface
 .PHONY : webi.sync webi.ctags
 webi.ctags:
@@ -96,10 +107,17 @@ fetchfw.sync:
 	$(SYNC) $(FETCHFW_DATA_LOCAL) $(XIVO_HOSTNAME):$(FETCHFW_DATA_PATH)
 
 # xivo-agent
-.PHONY : agent.sync
+.PHONY : agent.sync agentd-client.sync agentd-cli.sync
 agent.sync:
 	$(SYNC) $(AGENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agent restart'
+	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agentd restart'
+
+agentd-client.sync:
+	$(SYNC) --delete $(XIVO_PATH)/xivo-agentd-client $(XIVO_HOSTNAME):/tmp
+	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-agentd-client && python setup.py develop'
+
+agentd-cli.sync:
+	$(SYNC) $(XIVO_PATH)/xivo-agentd-cli/xivo_agentd_cli $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
 # xivo-agid
 .PHONY : agi.sync agi.ctags
@@ -183,9 +201,10 @@ db.sync:
 # xivo-dird
 .PHONY : dird.sync
 dird.sync:
-	$(SYNC) $(DIRD_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-	$(SYNC) $(DIRD_PATH)/debian/xivo-dird.init $(XIVO_HOSTNAME):/etc/init.d/xivo-dird
-	ssh $(XIVO_HOSTNAME) chmod a+x /etc/init.d/xivo-dird
+	$(SYNC) --delete $(XIVO_PATH)/xivo-dird $(XIVO_HOSTNAME):/tmp
+	$(SYNC) $(XIVO_PATH)/xivo-dird/bin/xivo-dird $(XIVO_HOSTNAME):/usr/bin/
+	$(SYNC) $(XIVO_PATH)/xivo-dird/etc/xivo-dird/ $(XIVO_HOSTNAME):/etc/xivo-dird
+	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-dird && python setup.py develop'
 
 # xivo-doc
 .PHONY : doc.build
@@ -297,4 +316,14 @@ lib-rest-client.sync:
 
 .PHONY : dird-client.sync
 dird-client.sync:
-	$(SYNC) $(DIRD_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	$(SYNC) --delete $(XIVO_PATH)/xivo-dird-client $(XIVO_HOSTNAME):/tmp
+	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-dird-client && python setup.py develop'
+
+
+.PHONY : confd-client.sync
+confd-client.sync:
+	$(SYNC) $(CONFD_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+.PHONY : monitoring.sync
+monitoring.sync:
+	$(SYNC) $(XIVO_PATH)/xivo-monitoring/checks/* $(XIVO_HOSTNAME):/usr/share/xivo-monitoring/checks/
