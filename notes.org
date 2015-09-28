@@ -1,0 +1,30 @@
+* Objectives: Be able to use my local development version of a daemon using stevedore's plugins and back to the normal version easily
+
+** Plan 1
+
+*** Mount or rsync the local copy to the XiVO
+*** python setup.py install --dest-dir <some-dir>
+*** mount bind dist-package <some-dir>
+*** umount to get back to the original version
+
+* Usage
+
+** xm --sync dao confd dird --restart confd dird --fg dird
+** xm --status
+** xm --reset dird
+** xm --fd dird
+** xm 
+
+
+
+---
+
+rsync -av --delete --exclude ".git" ~/dev/xivo/xivo-confd-client/ xivo-dev:~/xivo-confd-client  # dev
+
+cd ~/xivo-confd-client  # XiVO
+mkdir -p /root/build/lib/python2.7/site-packages/
+PYTHONPATH=~/build/lib/python2.7/site-packages python setup.py install --prefix=~/build  # XiVO
+umount /usr/lib/python2.7/dist-packages/xivo_confd_client
+umount /usr/lib/python2.7/dist-packages/xivo_confd_client-1.1.1.egg-info
+mount --bind /root/build/lib/python2.7/site-packages/xivo_confd_client-1.1.1-py2.7.egg/xivo_confd_client /usr/lib/python2.7/dist-packages/xivo_confd_client
+mount --bind /root/build/lib/python2.7/site-packages/xivo_confd_client-1.1.1-py2.7.egg/EGG-INFO /usr/lib/python2.7/dist-packages/xivo_confd_client-1.1.1.egg-info
