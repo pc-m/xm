@@ -324,6 +324,11 @@ dird-client.sync:
 confd-client.sync:
 	$(SYNC) $(CONFD_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
+.PHONY : auth-client.sync
+auth-client.sync:
+	$(SYNC) --delete $(XIVO_PATH)/xivo-auth-client $(XIVO_HOSTNAME):/tmp
+	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-auth-client && python setup.py develop'
+
 .PHONY : monitoring.sync
 monitoring.sync:
 	$(SYNC) $(XIVO_PATH)/xivo-monitoring/checks/* $(XIVO_HOSTNAME):/usr/share/xivo-monitoring/checks/
