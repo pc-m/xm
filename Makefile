@@ -205,7 +205,7 @@ dird.sync: dird.umount dird.bootstrap
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(XIVO_PATH)/xivo-dird/ $(XIVO_HOSTNAME):~/dev/xivo-dird
 	ssh -q $(XIVO_HOSTNAME) 'cd ~/dev/xivo-dird && PYTHONPATH=~/build/lib/python2.7/site-packages python setup.py install --prefix=~/build'
 	ssh -q $(XIVO_HOSTNAME) 'mount --bind /root/build/lib/python2.7/site-packages/xivo_dird-*-py2.7.egg/xivo_dird /usr/lib/python2.7/dist-packages/xivo_dird'
-	ssh -q $(XIVO_HOSTNAME) 'mount --bind /root/build/lib/python2.7/site-packages/xivo_dird-*-py2.7.egg/EGG-INFO /usr/lib/python2.7/dist-packages/xivo_dird-1.2.egg-info'
+	DIRD_VERSION=$(python $(DIRD_PATH)/setup.py --version) && ssh -q $(XIVO_HOSTNAME) "mount --bind /root/build/lib/python2.7/site-packages/xivo_dird-*-py2.7.egg/EGG-INFO /usr/lib/python2.7/dist-packages/xivo_dird-${DIRD_VERSION}.egg-info"
 
 dird.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount /usr/lib/python2.7/dist-packages/xivo_dird || true'
