@@ -199,12 +199,19 @@ db.sync:
 	$(SYNC) $(ALEMBIC_LOCAL_PATH)/* $(XIVO_HOSTNAME):$(ALEMBIC_REMOTE_PATH)/
 
 # xivo-dird
-.PHONY : dird.sync
-dird.sync:
-	$(SYNC) --delete $(XIVO_PATH)/xivo-dird $(XIVO_HOSTNAME):/tmp
-	$(SYNC) $(XIVO_PATH)/xivo-dird/bin/xivo-dird $(XIVO_HOSTNAME):/usr/bin/
-	$(SYNC) $(XIVO_PATH)/xivo-dird/etc/xivo-dird/ $(XIVO_HOSTNAME):/etc/xivo-dird
-	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-dird && python setup.py develop'
+.PHONY : dird.sync dird.umount dird.bootstrap
+dird.sync: dird.umount dird.bootstrap
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(XIVO_PATH)/xivo-dird/ $(XIVO_HOSTNAME):~/dev/xivo-dird
+	ssh -q $(XIVO_HOSTNAME) 'cd ~/dev/xivo-dird && PYTHONPATH=~/build/lib/python2.7/site-packages python setup.py install --prefix=~/build'
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind /root/build/lib/python2.7/site-packages/xivo_dird-*-py2.7.egg/xivo_dird /usr/lib/python2.7/dist-packages/xivo_dird'
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind /root/build/lib/python2.7/site-packages/xivo_dird-*-py2.7.egg/EGG-INFO /usr/lib/python2.7/dist-packages/xivo_dird-1.2.egg-info'
+
+dird.umount:
+	ssh -q $(XIVO_HOSTNAME) 'umount /usr/lib/python2.7/dist-packages/xivo_dird || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount /usr/lib/python2.7/dist-packages/xivo_dird-*.egg-info || true'
+
+dird.bootstrap:
+	ssh -q $(XIVO_HOSTNAME) 'mkdir -p ~/dev ~/build/lib/python2.7/site-packages'
 
 # xivo-doc
 .PHONY : doc.build
