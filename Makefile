@@ -86,8 +86,14 @@ SYNC=rsync -vrtlp --filter '- *.pyc' --filter '- *.git' --filter '- *~'
 XIVO_LIBSCCP_BUILDH=./buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
+# shared targets
+.PHONY : sync.bootstrap
+sync.bootstrap:
+	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
+
+
 # xivo-auth
-.PHONE : auth.sync
+.PHONY : auth.sync
 auth.sync:
 	$(SYNC) --delete $(XIVO_PATH)/xivo-auth $(XIVO_HOSTNAME):/tmp
 	$(SYNC) $(XIVO_PATH)/xivo-auth/bin/xivo-auth $(XIVO_HOSTNAME):/usr/bin/
@@ -160,24 +166,18 @@ confgen.sync:
 
 
 # xivo-ctid
-.PHONY : cti.unittest
-cti.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(CTI_LOCAL_PATH)
-endif
-
-.PHONY : cti.sync
+.PHONY : cti.sync cti.ctags cti.clean
 cti.sync:
 	$(SYNC) $(CTI_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
-.PHONY : cti.ctags
-cti.ctags:
-	rm -f $(CTI_TAGS)
+cti.ctags: cti.clean
 	ctags -o $(CTI_TAGS) -R -e $(CTI_LOCAL_PATH)
 	ctags -o $(CTI_TAGS) -R -e -a $(XIVO_DAO_LOCAL_PATH)
 	ctags -o $(CTI_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
+
+cti.clean:
+	rm -f $(CTI_TAGS)
+
 
 # xivo-dao
 .PHONY : dao.sync dao.unittest dao.ctags
@@ -202,19 +202,16 @@ db.sync:
 	$(SYNC) $(ALEMBIC_LOCAL_PATH)/* $(XIVO_HOSTNAME):$(ALEMBIC_REMOTE_PATH)/
 
 # xivo-dird
-.PHONY : dird.sync dird.umount dird.bootstrap dird.ctags dird.clean
-dird.sync: dird.umount dird.bootstrap
+.PHONY : dird.sync dird.umount dird.ctags dird.clean
+dird.sync: dird.umount sync.bootstrap
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(DIRD_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-dird
 	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-dird && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
 	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/xivo_dird ${REMOTE_PYTHONPATH}/xivo_dird'
-	DIRD_VERSION=$(python $(DIRD_PATH)/setup.py --version) && ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_dird-${DIRD_VERSION}.egg-info"
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_dird-$(shell ${DIRD_PATH}/setup.py --version).egg-info"
 
 dird.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird || true'
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird-*.egg-info || true'
-
-dird.bootstrap:
-	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 
 dird.ctags: dird.clean
 	ctags -o $(DIRD_TAGS) -R -e $(DIRD_PATH)/xivo_dird
