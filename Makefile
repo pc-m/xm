@@ -8,6 +8,7 @@ CALL_LOGS_PATH=$(XIVO_PATH)/xivo-call-logs
 CONFGEN_PATH=$(XIVO_PATH)/xivo-confgend
 CONFD_CLIENT_PATH=$(XIVO_PATH)/xivo-confd-client
 CONFIG_PATH=$(XIVO_PATH)/xivo-config
+CONSUL_PATH=$(XIVO_PATH)/xivo-consul-packaging
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
 DAO_PATH=$(XIVO_PATH)/xivo-dao
 DIRD_PATH=$(XIVO_PATH)/xivo-dird
@@ -201,8 +202,18 @@ dao.ctags:
 db.sync:
 	$(SYNC) $(ALEMBIC_LOCAL_PATH)/* $(XIVO_HOSTNAME):$(ALEMBIC_REMOTE_PATH)/
 
+# consul
+.PHONY : consul.sync consul.restart
+consul.sync:
+	rsync -av $(CONSUL_PATH)/debian/init $(XIVO_HOSTNAME):/etc/init.d/consul
+	ssh -q $(XIVO_HOSTNAME) 'chmod +x /etc/init.d/consul'
+
+consul.restart:
+	ssh -q $(XIVO_HOSTNAME) 'service consul restart'
+
+
 # xivo-dird
-.PHONY : dird.sync dird.umount dird.ctags dird.clean
+.PHONY : dird.sync dird.umount dird.ctags dird.clean dird.restart
 dird.sync: dird.umount sync.bootstrap
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(DIRD_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-dird
 	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-dird && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
@@ -222,6 +233,9 @@ dird.clean:
 	rm -rf $(DIRD_PATH)/.tox
 	find $(DIRD_PATH) -name '*.pyc' -delete
 	rm -f $(DIRD_TAGS)
+
+dird.restart:
+	ssh -q $(XIVO_HOSTNAME) 'service xivo-dird restart'
 
 
 # xivo-doc
