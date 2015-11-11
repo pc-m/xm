@@ -72,6 +72,7 @@ AGI_TAGS=$(AGI_PATH)/TAGS
 ASTERISK_TAGS=$(ASTERISK_PATH)/TAGS
 CTI_TAGS=$(CTI_PATH)/TAGS
 DAO_TAGS=$(DAO_PATH)/TAGS
+DIRD_TAGS=$(DIRD_PATH)/TAGS
 SCCP_TAGS=$(SCCP_PATH)/TAGS
 WEBI_TAGS=$(WEBI_PATH)/TAGS
 
@@ -199,7 +200,7 @@ db.sync:
 	$(SYNC) $(ALEMBIC_LOCAL_PATH)/* $(XIVO_HOSTNAME):$(ALEMBIC_REMOTE_PATH)/
 
 # xivo-dird
-.PHONY : dird.sync dird.umount dird.bootstrap
+.PHONY : dird.sync dird.umount dird.bootstrap dird.ctags dird.clean
 dird.sync: dird.umount dird.bootstrap
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(XIVO_PATH)/xivo-dird/ $(XIVO_HOSTNAME):~/dev/xivo-dird
 	ssh -q $(XIVO_HOSTNAME) 'cd ~/dev/xivo-dird && PYTHONPATH=~/build/lib/python2.7/site-packages python setup.py install --prefix=~/build'
@@ -212,6 +213,17 @@ dird.umount:
 
 dird.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) 'mkdir -p ~/dev ~/build/lib/python2.7/site-packages'
+
+dird.ctags: dird.clean
+	ctags -o $(DIRD_TAGS) -R -e $(DIRD_PATH)/xivo_dird
+	ctags -o $(DIRD_TAGS) -R -e -a $(XIVO_DAO_LOCAL_PATH)
+	ctags -o $(DIRD_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
+
+dird.clean:
+	rm -rf $(DIRD_PATH)/.tox
+	find $(DIRD_PATH) -name '*.pyc' -delete
+	rm -f $(DIRD_TAGS)
+
 
 # xivo-doc
 .PHONY : doc.build
