@@ -31,6 +31,8 @@ XIVO_PROVD_PYTHONPATH=$(XIVO_PATH)/xivo-provisioning
 CTI_PP=$(CTI_PATH)
 
 XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):$(XIVO_AGENT_PYTHONPATH):$(XIVO_PROVD_PYTHONPATH):$(CTI_PP):$(BUS_PP)
+TMP_PYTHONPATH=/root/build/lib/python2.7/site-packages
+REMOTE_PYTHONPATH=/usr/lib/python2.7/dist-packages
 
 # Local paths
 AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo_agent
@@ -202,17 +204,17 @@ db.sync:
 # xivo-dird
 .PHONY : dird.sync dird.umount dird.bootstrap dird.ctags dird.clean
 dird.sync: dird.umount dird.bootstrap
-	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(XIVO_PATH)/xivo-dird/ $(XIVO_HOSTNAME):~/dev/xivo-dird
-	ssh -q $(XIVO_HOSTNAME) 'cd ~/dev/xivo-dird && PYTHONPATH=~/build/lib/python2.7/site-packages python setup.py install --prefix=~/build'
-	ssh -q $(XIVO_HOSTNAME) 'mount --bind /root/build/lib/python2.7/site-packages/xivo_dird-*-py2.7.egg/xivo_dird /usr/lib/python2.7/dist-packages/xivo_dird'
-	DIRD_VERSION=$(python $(DIRD_PATH)/setup.py --version) && ssh -q $(XIVO_HOSTNAME) "mount --bind /root/build/lib/python2.7/site-packages/xivo_dird-*-py2.7.egg/EGG-INFO /usr/lib/python2.7/dist-packages/xivo_dird-${DIRD_VERSION}.egg-info"
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(DIRD_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-dird
+	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-dird && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/xivo_dird ${REMOTE_PYTHONPATH}/xivo_dird'
+	DIRD_VERSION=$(python $(DIRD_PATH)/setup.py --version) && ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_dird-${DIRD_VERSION}.egg-info"
 
 dird.umount:
-	ssh -q $(XIVO_HOSTNAME) 'umount /usr/lib/python2.7/dist-packages/xivo_dird || true'
-	ssh -q $(XIVO_HOSTNAME) 'umount /usr/lib/python2.7/dist-packages/xivo_dird-*.egg-info || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird-*.egg-info || true'
 
 dird.bootstrap:
-	ssh -q $(XIVO_HOSTNAME) 'mkdir -p ~/dev ~/build/lib/python2.7/site-packages'
+	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 
 dird.ctags: dird.clean
 	ctags -o $(DIRD_TAGS) -R -e $(DIRD_PATH)/xivo_dird
