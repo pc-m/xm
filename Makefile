@@ -183,17 +183,9 @@ cti.clean:
 
 
 # xivo-dao
-.PHONY : dao.sync dao.unittest dao.ctags
+.PHONY : dao.sync dao.ctags
 dao.sync:
 	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-
-.PHONY : dao.unittest
-dao.unittest:
-ifdef TARGET_FILE
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(TARGET_FILE)
-else
-	PYTHONPATH=$(XIVO_PYTHONPATH) nosetests $(DAO_LOCAL_PATH)
-endif
 
 dao.ctags:
 	rm -f $(DAO_TAGS)
