@@ -222,7 +222,6 @@ dird.sync: dird.umount sync.bootstrap
 	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/xivo_dird ${REMOTE_PYTHONPATH}/xivo_dird'
 	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_dird-$(shell ${DIRD_PATH}/setup.py --version).egg-info"
 
-
 dird.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird || true'
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird-*.egg-info || true'
@@ -236,6 +235,7 @@ dird.clean:
 	rm -rf $(DIRD_PATH)/.tox
 	find $(DIRD_PATH) -name '*.pyc' -delete
 	rm -f $(DIRD_TAGS)
+
 dird.restart:
 	ssh -q $(XIVO_HOSTNAME) 'service xivo-dird restart'
 
