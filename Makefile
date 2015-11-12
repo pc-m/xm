@@ -1,3 +1,5 @@
+XM_PATH=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
 # XiVO paths
 ASTERISK_PATH=$(XIVO_PATH)/asterisk11
 AGENT_PATH=$(XIVO_PATH)/xivo-agentd
@@ -91,7 +93,7 @@ XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential auto
 .PHONY : sync.bootstrap
 sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
-
+	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
 # xivo-auth
 .PHONY : auth.sync
@@ -220,6 +222,7 @@ dird.sync: dird.umount sync.bootstrap
 	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/xivo_dird ${REMOTE_PYTHONPATH}/xivo_dird'
 	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_dird-$(shell ${DIRD_PATH}/setup.py --version).egg-info"
 
+
 dird.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird || true'
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird-*.egg-info || true'
@@ -233,7 +236,6 @@ dird.clean:
 	rm -rf $(DIRD_PATH)/.tox
 	find $(DIRD_PATH) -name '*.pyc' -delete
 	rm -f $(DIRD_TAGS)
-
 dird.restart:
 	ssh -q $(XIVO_HOSTNAME) 'service xivo-dird restart'
 
