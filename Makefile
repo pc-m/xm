@@ -223,7 +223,7 @@ dird.sync: dird.umount sync.bootstrap
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(DIRD_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-dird
 	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-dird && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
 	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/xivo_dird ${REMOTE_PYTHONPATH}/xivo_dird'
-	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_dird-$(shell ${DIRD_PATH}/setup.py --version).egg-info"
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_dird-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_dird-$(shell $(DIRD_PATH)/setup.py --version).egg-info"
 
 dird.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_dird || true'
