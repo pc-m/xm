@@ -223,8 +223,10 @@ dird.umount:
 
 dird.ctags: dird.clean
 	ctags -o $(DIRD_TAGS) -R -e $(DIRD_PATH)/xivo_dird
-	ctags -o $(DIRD_TAGS) -R -e -a $(XIVO_DAO_LOCAL_PATH)
 	ctags -o $(DIRD_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
+	ctags -o $(DIRD_TAGS) -R -e -a $(XIVO_PATH)/xivo-auth-client/xivo_auth_client
+	ctags -o $(DIRD_TAGS) -R -e -a $(XIVO_PATH)/xivo-lib-rest-client/xivo_lib_rest_client
+	ctags -o $(DIRD_TAGS) -R -e -a $(XIVO_PATH)/xivo-confd-client/xivo_confd_client
 
 dird.clean:
 	rm -rf $(DIRD_PATH)/.tox
