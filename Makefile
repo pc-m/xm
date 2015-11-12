@@ -90,10 +90,13 @@ XIVO_LIBSCCP_BUILDH=./buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
 # shared targets
-.PHONY : sync.bootstrap
+.PHONY : sync.bootstrap xivo.umount
 sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
+
+xivo.umount: dird.umount
+	true
 
 # xivo-auth
 .PHONY : auth.sync
