@@ -95,8 +95,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: dird.umount cti.umount
-	true
+xivo.umount: dird.umount cti.umount ;
 
 # xivo-auth
 .PHONY : auth.sync
