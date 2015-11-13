@@ -95,7 +95,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: dird.umount
+xivo.umount: dird.umount cti.umount
 	true
 
 # xivo-auth
@@ -181,7 +181,7 @@ cti.sync: sync.bootstrap cti.umount
 
 cti.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_cti || true'
-	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_cti-*.egg-info || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid-*.egg-info || true'
 
 cti.ctags: cti.clean
 	ctags -o $(CTI_TAGS) -R -e $(CTI_LOCAL_PATH)
