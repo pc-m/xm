@@ -335,17 +335,25 @@ asterisk.generate:
 
 asterisk.refresh: asterisk.clean asterisk.generate sccp.ctags sccp.cscope
 
+################################################################################
 # dialplan
-.PHONY : dialplan.sync dialplan.reload dialplan.copy
+################################################################################
 
-dialplan.sync: dialplan.copy dialplan.reload
-
-dialplan.copy:
-	$(SYNC) $(DIALPLAN_LOCAL_PATH)/ $(XIVO_HOSTNAME):$(DIALPLAN_REMOTE_PATH)
-
+.PHONY : dialplan.sync dialplan.reload dialplan.reload dialplan.umount
 dialplan.reload:
-	ssh $(XIVO_HOSTNAME) 'asterisk -rx "dialplan reload"'
+	ssh -q $(XIVO_HOSTNAME) 'asterisk -rx "dialplan reload"'
 
+dialplan.sync: dialplan.umount sync.bootstrap
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(DIALPLAN_LOCAL_PATH)/ $(XIVO_HOSTNAME):~/dev/dialplan
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind ~/dev/dialplan/ $(DIALPLAN_REMOTE_PATH)'
+
+dialplan.umount:
+	ssh -q $(XIVO_HOSTNAME) 'umount $(DIALPLAN_REMOTE_PATH) || true'
+
+
+################################################################################
+# lib-rest-client
+################################################################################
 
 .PHONY : lib-rest-client.sync
 lib-rest-client.sync:
