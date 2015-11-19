@@ -201,12 +201,24 @@ dao.ctags:
 	rm -f $(DAO_TAGS)
 	ctags -o $(DAO_TAGS) -R -e $(DAO_LOCAL_PATH)
 
+
+################################################################################
 # xivo-manage-db
-.PHONY : db.sync
+################################################################################
+.PHONY : db.sync db.upgrade db.downgrade
 db.sync:
 	$(SYNC) $(ALEMBIC_LOCAL_PATH)/* $(XIVO_HOSTNAME):$(ALEMBIC_REMOTE_PATH)/
 
+db.upgrade:
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/xivo-manage-db && alembic upgrade +1'
+
+db.downgrade:
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/xivo-manage-db && alembic downgrade -1'
+
+################################################################################
 # consul
+################################################################################
+
 .PHONY : consul.sync consul.restart
 consul.sync:
 	rsync -av $(CONSUL_PATH)/debian/init $(XIVO_HOSTNAME):/etc/init.d/consul
