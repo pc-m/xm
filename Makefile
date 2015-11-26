@@ -75,6 +75,7 @@ DIALPLAN_REMOTE_PATH=/usr/share/xivo-config/dialplan/asterisk
 # Tags
 AGI_TAGS=$(AGI_PATH)/TAGS
 ASTERISK_TAGS=$(ASTERISK_PATH)/TAGS
+CONFD_TAGS=$(CONFD_PATH)/TAGS
 CTI_TAGS=$(CTI_PATH)/TAGS
 DAO_TAGS=$(DAO_PATH)/TAGS
 DIRD_TAGS=$(DIRD_PATH)/TAGS
@@ -95,7 +96,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: dird.umount cti.umount ;
+xivo.umount: dird.umount cti.umount dialplan.umount ;
 
 # xivo-auth
 .PHONY : auth.sync
@@ -309,17 +310,41 @@ provd.sync:
 upgrade.sync:
 	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
 
+################################################################################
 # xivo-confd
-.PHONY : confd.sync confd.functest
+################################################################################
 
-confd.sync:
-	$(SYNC) $(CONFD_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+.PHONY : confd.sync confd.umount confd.ctags confd.clean confd.restart
+confd.sync: confd.umount sync.bootstrap
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CONFD_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-confd
+	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-confd && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_confd-*-py2.7.egg/xivo_confd ${REMOTE_PYTHONPATH}/xivo_confd'
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_confd-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_confd-$(shell $(CONFD_PATH)/setup.py --version).egg-info"
 
-confd.functest:
-	PYTHONPATH=$(XIVO_PYTHONPATH):$(XIVO_PATH)/xivo-acceptance:$(XIVO_PATH)/xivo-ws lettuce -v3 ~/d/xivo-confd/xivo-confd/acceptance
+confd.umount:
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confd || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confd-*.egg-info || true'
+
+confd.clean:
+	rm -rf $(CONFD_PATH)/.tox
+	find $(CONFD_PATH) -name '*.pyc' -delete
+	rm -f $(CONFD_TAGS)
+
+confd.ctags: confd.clean
+	ctags -o $(CONFD_TAGS) -R -e $(CONFD_PATH)/xivo_confd
+	ctags -o $(CONFD_TAGS) -R -e -a $(LIB_PYTHON_LOCAL_PATH)
+	ctags -o $(CONFD_TAGS) -R -e -a $(XIVO_PATH)/xivo-auth-client/xivo_auth_client
+	ctags -o $(CONFD_TAGS) -R -e -a $(XIVO_PATH)/xivo-lib-rest-client/xivo_lib_rest_client
+	ctags -o $(CONFD_TAGS) -R -e -a $(XIVO_PATH)/xivo-dao/xivo_dao
+
+confd.restart:
+	ssh -q $(XIVO_HOSTNAME) 'service xivo-confd restart'
 
 
+################################################################################
 # xivo-sysconf
+################################################################################
+
 .PHONY : sysconf.sync
 sysconf.sync:
 	$(SYNC) $(SYSCONF_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
