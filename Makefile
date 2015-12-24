@@ -75,6 +75,7 @@ DIALPLAN_REMOTE_PATH=/usr/share/xivo-config/dialplan/asterisk
 # Tags
 AGI_TAGS=$(AGI_PATH)/TAGS
 ASTERISK_TAGS=$(ASTERISK_PATH)/TAGS
+BUS_TAGS=$(BUS_PATH)/TAGS
 CONFD_TAGS=$(CONFD_PATH)/TAGS
 CTI_TAGS=$(CTI_PATH)/TAGS
 DAO_TAGS=$(DAO_PATH)/TAGS
@@ -154,12 +155,26 @@ amid.sync:
 backup.sync:
 	$(SYNC) $(BACKUP_PATH)/bin/ $(XIVO_HOSTNAME):/usr/sbin
 
+################################################################################
 # xivo-bus
-.PHONY : bus.sync
+################################################################################
+
+.PHONY : bus.sync bus.clean bus.tags
 bus.sync:
 	$(SYNC) $(BUS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
+bus.tags: bus.clean
+	ctags -o $(BUS_TAGS) -R -e $(BUS_LOCAL_PATH)
+
+bus.clean:
+	rm -rf $(BUS_PATH)/.tox
+	find $(BUS_PATH) -name '*.pyc' -delete
+	rm -f $(BUS_TAGS)
+
+################################################################################
 # xivo-call-logs
+################################################################################
+
 .PHONE : call-logs.sync
 call-logs.sync:
 	$(SYNC) $(CALL_LOGS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
