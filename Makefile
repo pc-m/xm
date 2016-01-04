@@ -12,6 +12,7 @@ CONFD_CLIENT_PATH=$(XIVO_PATH)/xivo-confd-client
 CONFIG_PATH=$(XIVO_PATH)/xivo-config
 CONSUL_PATH=$(XIVO_PATH)/xivo-consul-packaging
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
+CTIDNG_PATH=$(XIVO_PATH)/xivo-ctid-ng
 DAO_PATH=$(XIVO_PATH)/xivo-dao
 DIRD_PATH=$(XIVO_PATH)/xivo-dird
 DIRD_CLIENT_PATH=$(XIVO_PATH)/xivo-dird-client
@@ -97,7 +98,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: dird.umount cti.umount dialplan.umount ;
+xivo.umount: dird.umount cti.umount dialplan.umount ctid-ng.umount ;
 
 # xivo-auth
 .PHONY : auth.sync
@@ -175,7 +176,7 @@ bus.clean:
 # xivo-call-logs
 ################################################################################
 
-.PHONE : call-logs.sync
+.PHONY : call-logs.sync
 call-logs.sync:
 	$(SYNC) $(CALL_LOGS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
@@ -185,8 +186,10 @@ confgen.sync:
 	$(SYNC) $(CONFGEN_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-confgend restart'
 
-
+################################################################################
 # xivo-ctid
+################################################################################
+
 .PHONY : cti.sync cti.ctags cti.clean cti.umount
 cti.sync: sync.bootstrap cti.umount
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTI_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid
@@ -208,7 +211,24 @@ cti.clean:
 	find $(CTI_PATH) -name '*.pyc' -delete
 	rm -f $(CTI_TAGS)
 
+################################################################################
+# xivo-ctid-ng
+################################################################################
+
+.PHONY: ctid-ng.sync ctid-ng.umount
+ctid-ng.sync: sync.bootstrap ctid-ng.umount
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTIDNG_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid-ng
+	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-ctid-ng && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind ~/build/bdist.linux-x86_64/egg/xivo_ctid_ng ${REMOTE_PYTHONPATH}/xivo_ctid_ng'
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_ctid_ng-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_ctid_ng-$(shell $(CTIDNG_PATH)/setup.py --version).egg-info"
+
+ctid-ng.umount:
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng-*.egg-info || true'
+
+################################################################################
 # xivo-dao
+################################################################################
 .PHONY : dao.sync dao.ctags
 dao.sync:
 	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
