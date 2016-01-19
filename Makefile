@@ -194,8 +194,8 @@ confgen.sync:
 cti.sync: sync.bootstrap cti.umount
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTI_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid
 	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-ctid && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
-	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_ctid-*-py2.7.egg/xivo_cti ${REMOTE_PYTHONPATH}/xivo_cti'
-	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_ctid-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_ctid-$(shell $(CTI_PATH)/setup.py --version).egg-info"
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-ctid/build/lib.linux-*-2.7/xivo_cti ${REMOTE_PYTHONPATH}/xivo_cti"
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-ctid/xivo_ctid.egg-info ${REMOTE_PYTHONPATH}/xivo_ctid-$(shell $(CTI_PATH)/setup.py --version).egg-info"
 
 cti.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_cti || true'
@@ -219,8 +219,8 @@ cti.clean:
 ctid-ng.sync: sync.bootstrap ctid-ng.umount
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTIDNG_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid-ng
 	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-ctid-ng && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
-	ssh -q $(XIVO_HOSTNAME) 'mount --bind ~/build/bdist.linux-x86_64/egg/xivo_ctid_ng ${REMOTE_PYTHONPATH}/xivo_ctid_ng'
-	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_ctid_ng-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_ctid_ng-$(shell $(CTIDNG_PATH)/setup.py --version).egg-info"
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind ~/dev/xivo-ctid-ng/build/lib.linux-*-2.7/xivo_ctid_ng ${REMOTE_PYTHONPATH}/xivo_ctid_ng'
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-ctid-ng/xivo_ctid_ng.egg-info ${REMOTE_PYTHONPATH}/xivo_ctid_ng-$(shell python $(CTIDNG_PATH)/setup.py --version).egg-info"
 
 ctid-ng.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng || true'
