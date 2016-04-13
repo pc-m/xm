@@ -449,9 +449,29 @@ dird-client.sync:
 	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-dird-client && python setup.py develop'
 
 
-.PHONY : confd-client.sync
-confd-client.sync:
-	$(SYNC) $(CONFD_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+################################################################################
+# confd-client
+################################################################################
+
+.PHONY : confd-client.sync confd-client.umount confd-client.clean
+
+confd-client.sync: confd-client.umount confd-client.clean sync.bootstrap
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CONFD_CLIENT_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-confd-client
+	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-confd-client && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind ~/dev/xivo-confd-client/xivo_confd_client ${REMOTE_PYTHONPATH}/xivo_confd_client'
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-confd-client/xivo_confd_client.egg-info ${REMOTE_PYTHONPATH}/xivo_confd_client-1.1.2.egg-info"
+
+confd-client.umount:
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confd_client || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confd_client-*.egg-info || true'
+
+confd-client.clean:
+	rm -rf $(CONFD_CLIENT_PATH)/.tox
+	find $(CONFD_CLIENT_PATH) -name '*.pyc' -delete
+
+################################################################################
+# auth-client
+################################################################################
 
 .PHONY : auth-client.sync
 auth-client.sync:
