@@ -190,7 +190,7 @@ confgen.sync:
 # xivo-ctid
 ################################################################################
 
-.PHONY : cti.sync cti.ctags cti.clean cti.umount
+.PHONY : cti.sync cti.ctags cti.clean cti.umount cti.restart
 cti.sync: sync.bootstrap cti.umount
 	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTI_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid
 	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-ctid && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
@@ -210,6 +210,9 @@ cti.clean:
 	rm -rf $(CTI_PATH)/.tox
 	find $(CTI_PATH) -name '*.pyc' -delete
 	rm -f $(CTI_TAGS)
+
+cti.restart:
+	ssh -q $(XIVO_HOSTNAME) 'systemctl restart xivo-ctid.service'
 
 ################################################################################
 # xivo-ctid-ng
