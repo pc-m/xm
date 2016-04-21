@@ -12,6 +12,7 @@ CONFD_CLIENT_PATH=$(XIVO_PATH)/xivo-confd-client
 CONFIG_PATH=$(XIVO_PATH)/xivo-config
 CONSUL_PATH=$(XIVO_PATH)/xivo-consul-packaging
 CTI_PATH=$(XIVO_PATH)/xivo-ctid
+CTID_NG_CLIENT_PATH=$(XIVO_PATH)/xivo-ctid-ng-client
 CTIDNG_PATH=$(XIVO_PATH)/xivo-ctid-ng
 DAO_PATH=$(XIVO_PATH)/xivo-dao
 DIRD_PATH=$(XIVO_PATH)/xivo-dird
@@ -481,3 +482,23 @@ auth-client.sync:
 .PHONY : monitoring.sync
 monitoring.sync:
 	$(SYNC) $(XIVO_PATH)/xivo-monitoring/checks/* $(XIVO_HOSTNAME):/usr/share/xivo-monitoring/checks/
+
+
+################################################################################
+# ctid-ng-client
+################################################################################
+
+.PHONY: ctid-ng-client.sync ctid-ng-client.umount ctid-ng-client.clean
+ctid-ng-client.sync: ctid-ng-client.umount ctid-ng-client.clean sync.bootstrap
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTID_NG_CLIENT_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid-ng-client
+	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-ctid-ng-client && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
+	ssh -q $(XIVO_HOSTNAME) 'mount --bind ~/dev/xivo-ctid-ng-client/xivo_ctid_ng_client ${REMOTE_PYTHONPATH}/xivo_ctid_ng_client'
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-ctid-ng-client/xivo_ctid_ng_client.egg-info ${REMOTE_PYTHONPATH}/xivo_ctid_ng_client-0.1.egg-info"
+
+ctid-ng-client.umount:
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng_client || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng_client-*.egg-info || true'
+
+ctid-ng-client.clean:
+	rm -rf $(CTID_NG_CLIENT_PATH)/.tox
+	find $(CTID_NG_CLIENT_PATH) -name '*.pyc' -delete
