@@ -502,3 +502,13 @@ ctid-ng-client.umount:
 ctid-ng-client.clean:
 	rm -rf $(CTID_NG_CLIENT_PATH)/.tox
 	find $(CTID_NG_CLIENT_PATH) -name '*.pyc' -delete
+
+
+.PHONY: token.admin token.user
+token.admin:
+	@read -p "Username: " username; \
+	curl -ksX POST --header 'Content-Type: application/json' --header 'Accept: application/json' -u $$username  -d '{"backend": "xivo_service", "expiration": 36000}' "https://${XIVO_HOSTNAME}:9497/0.1/token" | jq -r '.[] | .token'
+
+token.user:
+	@read -p "Username: " username; \
+	curl -ksX POST --header 'Content-Type: application/json' --header 'Accept: application/json' -u $$username  -d '{"backend": "xivo_user", "expiration": 36000}' "https://${XIVO_HOSTNAME}:9497/0.1/token" | jq -r '.[] | .token'
