@@ -102,12 +102,15 @@ sync.bootstrap:
 xivo.umount: dird.umount cti.umount dialplan.umount ctid-ng.umount confd.umount ;
 
 # xivo-auth
-.PHONY : auth.sync
+.PHONY : auth.sync auth.restart
 auth.sync:
 	$(SYNC) --delete $(XIVO_PATH)/xivo-auth $(XIVO_HOSTNAME):/tmp
 	$(SYNC) $(XIVO_PATH)/xivo-auth/bin/xivo-auth $(XIVO_HOSTNAME):/usr/bin/
 	$(SYNC) $(XIVO_PATH)/xivo-auth/etc/xivo-auth/ $(XIVO_HOSTNAME):/etc/xivo-auth
 	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-auth && python setup.py develop'
+
+auth.restart:
+	ssh $(XIVO_HOSTNAME) 'systemctl restart xivo-auth'
 
 # xivo-web-interface
 .PHONY : webi.sync webi.ctags
