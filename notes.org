@@ -28,3 +28,10 @@ umount /usr/lib/python2.7/dist-packages/xivo_confd_client
 umount /usr/lib/python2.7/dist-packages/xivo_confd_client-1.1.1.egg-info
 mount --bind /root/build/lib/python2.7/site-packages/xivo_confd_client-1.1.1-py2.7.egg/xivo_confd_client /usr/lib/python2.7/dist-packages/xivo_confd_client
 mount --bind /root/build/lib/python2.7/site-packages/xivo_confd_client-1.1.1-py2.7.egg/EGG-INFO /usr/lib/python2.7/dist-packages/xivo_confd_client-1.1.1.egg-info
+
+* setup
+
+# On the XiVO
+apt-get install nfs-common
+mkdir -p /var/dev/xivo
+mount 10.37.0.1:/home/pcm/dev/xivo /var/dev/xivo

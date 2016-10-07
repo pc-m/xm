@@ -94,25 +94,39 @@ XIVO_LIBSCCP_BUILDH=./buildh
 XIVO_LIBSCCP_DEP_COMMAND='apt-get update && apt-get install build-essential autoconf automake libtool asterisk-dev'
 
 # shared targets
-.PHONY : sync.bootstrap xivo.umount
+.PHONY : sync.bootstrap xivo.umount xivo.mount
 sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: dird.umount cti.umount dialplan.umount ctid-ng.umount confd.umount ;
+xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount ;
 
+xivo.mount:
+	ssh -q $(XIVO_HOSTNAME) "mount 10.37.0.1:${XIVO_PATH} /var/dev/xivo 2>&1 | grep -v 'already mounted' || true"
+
+################################################################################
 # xivo-auth
-.PHONY : auth.sync auth.restart
-auth.sync:
-	$(SYNC) --delete $(XIVO_PATH)/xivo-auth $(XIVO_HOSTNAME):/tmp
-	$(SYNC) $(XIVO_PATH)/xivo-auth/bin/xivo-auth $(XIVO_HOSTNAME):/usr/bin/
-	$(SYNC) $(XIVO_PATH)/xivo-auth/etc/xivo-auth/ $(XIVO_HOSTNAME):/etc/xivo-auth
-	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-auth && python setup.py develop'
+################################################################################
+.PHONY : auth.sync auth.mount auth.orig auth.restart auth.umount
+auth.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount --bind /var/dev/xivo/xivo-auth/xivo_auth ${REMOTE_PYTHONPATH}/xivo_auth"
+
+auth.sync: auth.mount
+	ssh $(XIVO_HOSTNAME) 'cd /var/dev/xivo/xivo-auth && python setup.py develop'
+
+auth.umount:
+	ssh $(XIVO_HOSTNAME) "umount ${REMOTE_PYTHONPATH}/xivo_auth || true"
+
+auth.orig:
+	ssh $(XIVO_HOSTNAME) "cd /var/dev/xivo/xivo-auth && python setup.py develop --uninstall"
+	ssh $(XIVO_HOSTNAME) "rm -f /usr/local/bin/xivo-auth"
 
 auth.restart:
 	ssh $(XIVO_HOSTNAME) 'systemctl restart xivo-auth'
 
+################################################################################
 # xivo-web-interface
+################################################################################
 .PHONY : webi.sync webi.ctags
 webi.ctags:
 	rm -f $(WEBI_TAGS)
