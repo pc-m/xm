@@ -107,15 +107,17 @@ xivo.mount:
 ################################################################################
 # xivo-auth
 ################################################################################
-.PHONY : auth.sync auth.mount auth.orig auth.restart auth.umount
+.PHONY : auth.sync auth.mount auth.orig auth.restart auth.umount auth.db-upgrade auth.db_downgrade
 auth.mount: xivo.mount
 	ssh $(XIVO_HOSTNAME) "mount --bind /var/dev/xivo/xivo-auth/xivo_auth ${REMOTE_PYTHONPATH}/xivo_auth"
+	ssh $(XIVO_HOSTNAME) "mount --bind /var/dev/xivo/xivo-auth/alembic /usr/share/xivo-auth/alembic"
 
 auth.sync: auth.mount
 	ssh $(XIVO_HOSTNAME) 'cd /var/dev/xivo/xivo-auth && python setup.py develop'
 
 auth.umount:
 	ssh $(XIVO_HOSTNAME) "umount ${REMOTE_PYTHONPATH}/xivo_auth || true"
+	ssh $(XIVO_HOSTNAME) "umount /usr/share/xivo-auth/alembic || true"
 
 auth.orig:
 	ssh $(XIVO_HOSTNAME) "cd /var/dev/xivo/xivo-auth && python setup.py develop --uninstall"
@@ -123,6 +125,12 @@ auth.orig:
 
 auth.restart:
 	ssh $(XIVO_HOSTNAME) 'systemctl restart xivo-auth'
+
+auth.db-upgrade:
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/xivo-auth && alembic -c alembic.ini upgrade head'
+
+auth.db-downgrade:
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/xivo-auth && alembic -c alembic.ini downgrade -1'
 
 ################################################################################
 # xivo-web-interface
