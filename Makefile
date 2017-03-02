@@ -206,11 +206,18 @@ bus.clean:
 call-logs.sync:
 	$(SYNC) $(CALL_LOGS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
+################################################################################
 # xivo-confgen
-.PHONY : confgen.sync
-confgen.sync:
-	$(SYNC) $(CONFGEN_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-confgend restart'
+################################################################################
+.PHONY : confgen.sync confgen.umount
+confgend.sync: sync.bootstrap confgend.umount
+	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CONFGEN_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-confgend
+	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-confgend && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
+	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-confgend/build/lib.linux-*-2.7/xivo_confgen ${REMOTE_PYTHONPATH}/xivo_confgen"
+
+confgend.umount:
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confgen || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confgen-*.egg-info || true'
 
 ################################################################################
 # xivo-ctid
@@ -375,10 +382,22 @@ sccp.cscope:
 .PHONY : provd.sync
 provd.sync:
 	$(SYNC) $(XIVO_PROVD_PYTHONPATH)/provd $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+	$(SYNC) $(XIVO_PROVD_PYTHONPATH)/debian/xivo-provd.service $(XIVO_HOSTNAME):/lib/systemd/system/xivo-provd.service
 
+
+################################################################################
+# xivo-provd-cli
+################################################################################
+
+.PHONY : provd-cli.sync
+provd-cli.sync:
+	$(SYNC) $(XIVO_PATH)/xivo-provd-cli/xivo_provd_cli $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+
+################################################################################
 # xivo-upgrade
-.PHONY : upgrade.sync
+################################################################################
 
+.PHONY : upgrade.sync
 upgrade.sync:
 	$(SYNC) $(UPGRADE_LOCAL_PATH)/bin/ $(XIVO_HOSTNAME):/usr/bin/
 
