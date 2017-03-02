@@ -135,13 +135,13 @@ auth.db-downgrade:
 ################################################################################
 # xivo-web-interface
 ################################################################################
-.PHONY : webi.sync webi.ctags
+.PHONY : webi.mount webi.ctags
 webi.ctags:
 	rm -f $(WEBI_TAGS)
 	ctags -o $(WEBI_TAGS) -R -e --langmap=php:.php.inc $(WEBI_LOCAL_PATH)
 
-webi.sync:
-	$(SYNC) $(WEBI_LOCAL_PATH)/ $(XIVO_HOSTNAME):$(WEBI_REMOTE_PATH)
+webi.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q "${WEBI_REMOTE_PATH}" || mount --bind /var/dev/xivo/xivo-web-interface/src ${WEBI_REMOTE_PATH}"
 
 # xivo-fetchfw
 .PHONY : fetchfw.sync
