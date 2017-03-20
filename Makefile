@@ -150,16 +150,31 @@ fetchfw.sync:
 	$(SYNC) $(FETCHFW_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 	$(SYNC) $(FETCHFW_DATA_LOCAL) $(XIVO_HOSTNAME):$(FETCHFW_DATA_PATH)
 
-# xivo-agent
-.PHONY : agent.sync agentd-client.sync agentd-cli.sync
-agent.sync:
-	$(SYNC) $(AGENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
-	ssh $(XIVO_HOSTNAME) '/etc/init.d/xivo-agentd restart'
+################################################################################
+# xivo-agentd
+################################################################################
+.PHONY : agentd.mount agentd-restart agentd.umuont
+agentd.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_agent type\" || mount --bind /var/dev/xivo/xivo-agentd/xivo_agent ${REMOTE_PYTHONPATH}/xivo_agent"
 
+agentd.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_agent type\" && umount ${REMOTE_PYTHONPATH}/xivo_agent || true"
+
+agentd.restart:
+	ssh $(XIVO_HOSTNAME) 'systemctl restart xivo-agentd'
+
+################################################################################
+# xivo-agentd-client
+################################################################################
+.PHONY : agentd-client.sync
 agentd-client.sync:
 	$(SYNC) --delete $(XIVO_PATH)/xivo-agentd-client $(XIVO_HOSTNAME):/tmp
 	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-agentd-client && python setup.py develop'
 
+################################################################################
+# xivo-agentd-cli
+################################################################################
+.PHONY : agentd-cli.sync
 agentd-cli.sync:
 	$(SYNC) $(XIVO_PATH)/xivo-agentd-cli/xivo_agentd_cli $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
