@@ -110,8 +110,8 @@ xivo.mount:
 ################################################################################
 .PHONY : auth.sync auth.mount auth.orig auth.restart auth.umount auth.db-upgrade auth.db_downgrade
 auth.mount: xivo.mount
-	ssh $(XIVO_HOSTNAME) "mount --bind /var/dev/xivo/xivo-auth/xivo_auth ${REMOTE_PYTHONPATH}/xivo_auth"
-	ssh $(XIVO_HOSTNAME) "mount --bind /var/dev/xivo/xivo-auth/alembic /usr/share/xivo-auth/alembic"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_auth type\" || mount --bind /var/dev/xivo/xivo-auth/xivo_auth ${REMOTE_PYTHONPATH}/xivo_auth"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/share/xivo-auth/alembic type\" || mount --bind /var/dev/xivo/xivo-auth/alembic /usr/share/xivo-auth/alembic"
 
 auth.sync: auth.mount
 	ssh $(XIVO_HOSTNAME) 'cd /var/dev/xivo/xivo-auth && python setup.py develop'
