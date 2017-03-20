@@ -99,10 +99,11 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount ;
+xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount
+	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
-	ssh -q $(XIVO_HOSTNAME) "mount 10.37.0.1:${XIVO_PATH} /var/dev/xivo 2>&1 | grep -v 'already mounted' || true"
+	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" || mount 10.37.0.1:${XIVO_PATH} /var/dev/xivo"
 
 ################################################################################
 # xivo-auth
