@@ -38,6 +38,7 @@ CTI_PP=$(CTI_PATH)
 XIVO_PYTHONPATH=$(LIB_PYTHON_PP):$(XIVO_DAO_PYTHONPATH):$(XIVO_DIRD_PYTHONPATH):$(XIVO_AGENT_PYTHONPATH):$(XIVO_PROVD_PYTHONPATH):$(CTI_PP):$(BUS_PP)
 TMP_PYTHONPATH=/root/build/lib/python2.7/site-packages
 REMOTE_PYTHONPATH=/usr/lib/python2.7/dist-packages
+REMOTE_PYTHON3PATH=/usr/lib/python3/dist-packages
 
 # Local paths
 AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo_agent
@@ -563,6 +564,15 @@ ctid-ng-client.clean:
 	rm -rf $(CTID_NG_CLIENT_PATH)/.tox
 	find $(CTID_NG_CLIENT_PATH) -name '*.pyc' -delete
 
+################################################################################
+# wazo-plugind
+################################################################################
+.PHONY : plugind.mount plugind.umount
+plugind.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind type\" || mount --bind /var/dev/xivo/wazo-plugind/wazo_plugind ${REMOTE_PYTHON3PATH}/wazo_plugind"
+
+plugind.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind type\" && umount ${REMOTE_PYTHON3PATH}/wazo_plugind || true"
 
 .PHONY: token.admin token.user
 token.admin:
