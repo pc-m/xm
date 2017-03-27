@@ -226,7 +226,7 @@ call-logs.mount: xivo.mount
 
 call-logs.umount:
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs type\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs || true"
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs-*.egg-info/entry_points.txt || true"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt || true"
 
 call-logs.entry-points: xivo.mount
 	ssh $(XIVO_HOSTNAME) "cd /var/dev/xivo/xivo-call-logs && python setup.py egg_info"
