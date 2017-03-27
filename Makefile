@@ -219,9 +219,13 @@ bus.clean:
 # xivo-call-logs
 ################################################################################
 
-.PHONY : call-logs.sync
-call-logs.sync:
-	$(SYNC) $(CALL_LOGS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+.PHONY : call-logs.mount call-logs.umount
+call-logs.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs type\" || mount --bind /var/dev/xivo/xivo-call-logs/xivo_call_logs ${REMOTE_PYTHONPATH}/xivo_call_logs"
+
+call-logs.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs type\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs || true"
+
 
 ################################################################################
 # xivo-confgen
