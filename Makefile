@@ -219,12 +219,17 @@ bus.clean:
 # xivo-call-logs
 ################################################################################
 
-.PHONY : call-logs.mount call-logs.umount
+.PHONY : call-logs.mount call-logs.umount call-logs.entry-points
 call-logs.mount: xivo.mount
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs type\" || mount --bind /var/dev/xivo/xivo-call-logs/xivo_call_logs ${REMOTE_PYTHONPATH}/xivo_call_logs"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs-*.egg-info/entry_points.txt\" || if [[ -e \"/var/dev/xivo/xivo-call-logs/xivo_call_logs.egg-info/entry_points.txt\" ]]; then mount --bind /var/dev/xivo/xivo-call-logs/xivo_call_logs.egg-info/entry_points.txt ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt; fi"
 
 call-logs.umount:
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs type\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs || true"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs-*.egg-info/entry_points.txt || true"
+
+call-logs.entry-points: xivo.mount
+	ssh $(XIVO_HOSTNAME) "cd /var/dev/xivo/xivo-call-logs && python setup.py egg_info"
 
 
 ################################################################################
