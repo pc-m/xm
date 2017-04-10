@@ -549,9 +549,16 @@ auth-client.sync:
 	$(SYNC) --delete $(XIVO_PATH)/xivo-auth-client $(XIVO_HOSTNAME):/tmp
 	ssh $(XIVO_HOSTNAME) 'cd /tmp/xivo-auth-client && python setup.py develop'
 
-.PHONY : monitoring.sync
-monitoring.sync:
-	$(SYNC) $(XIVO_PATH)/xivo-monitoring/checks/* $(XIVO_HOSTNAME):/usr/share/xivo-monitoring/checks/
+################################################################################
+# monitoring
+################################################################################
+
+.PHONY : monitoring.mount monitoring.umount
+monitoring.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "cat /proc/mounts | awk '{ print $2 }' | grep -q /usr/share/xivo-monitoring/checks || mount --bind /var/dev/xivo/xivo-monitoring/checks /usr/share/xivo-monitoring/checks"
+
+monitoring.umount:
+	ssh $(XIVO_HOSTNAME) "cat /proc/mounts | awk '{ print $2 }' | grep -q /usr/share/xivo-monitoring/checks && umount /usr/share/xivo-monitoring/checks || true"
 
 
 ################################################################################
