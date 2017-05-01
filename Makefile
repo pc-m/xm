@@ -374,12 +374,21 @@ doc.clean:
 .PHONY : doc.rebuild
 doc.rebuild: doc.clean doc.build
 
+################################################################################
 # xivo-lib-python
-.PHONY : lib-python.sync
-lib-python.sync:
-	$(SYNC) $(LIB_PYTHON_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+################################################################################
+.PHONY : lib-python.mount lib-python.umount
+lib-python.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo type\" || mount --bind /var/dev/xivo/xivo-lib-python/xivo ${REMOTE_PYTHONPATH}/xivo"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/xivo type\" || mount --bind /var/dev/xivo/xivo-lib-python/xivo ${REMOTE_PYTHON3PATH}/xivo"
 
+lib-python.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo type\" && umount ${REMOTE_PYTHONPATH}/xivo || true"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/xivo type\" && umount ${REMOTE_PYTHON3PATH}/xivo || true"
+
+################################################################################
 # xivo-libsccp
+################################################################################
 .PHONY : sccp.sync
 sccp.sync:
 	cd $(SCCP_LOCAL_PATH)/xivo-libsccp && $(XIVO_LIBSCCP_BUILDH) makei
