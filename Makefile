@@ -595,8 +595,10 @@ ctid-ng-client.clean:
 .PHONY : plugind.mount plugind.umount
 plugind.mount: xivo.mount
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind type\" || mount --bind /var/dev/xivo/wazo-plugind/wazo_plugind ${REMOTE_PYTHON3PATH}/wazo_plugind"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/lib/wazo-plugind/templates type\" || mount --bind /var/dev/xivo/wazo-plugind/templates /usr/lib/wazo-plugind/templates"
 
 plugind.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/lib/wazo-plugind/templates type\" && umount /usr/lib/wazo-plugind/templates || true"
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind type\" && umount ${REMOTE_PYTHON3PATH}/wazo_plugind || true"
 
 .PHONY: token.admin token.user
