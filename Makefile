@@ -100,7 +100,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount
+xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
@@ -203,9 +203,14 @@ backup.sync:
 # xivo-bus
 ################################################################################
 
-.PHONY : bus.sync bus.clean bus.tags
-bus.sync:
-	$(SYNC) $(BUS_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+.PHONY : bus.mount bus.umount bus.clean bus.tags
+bus.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_bus type\" || mount --bind /var/dev/xivo/xivo-bus/xivo_bus ${REMOTE_PYTHONPATH}/xivo_bus"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/xivo_bus type\" || mount --bind /var/dev/xivo/xivo-bus/xivo_bus ${REMOTE_PYTHON3PATH}/xivo_bus"
+
+bus.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_bus type\" && umount ${REMOTE_PYTHONPATH}/xivo_bus || true"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/xivo_bus type\" && umount ${REMOTE_PYTHON3PATH}/xivo_bus || true"
 
 bus.tags: bus.clean
 	ctags -o $(BUS_TAGS) -R -e $(BUS_LOCAL_PATH)
@@ -279,16 +284,14 @@ cti.restart:
 # xivo-ctid-ng
 ################################################################################
 
-.PHONY: ctid-ng.sync ctid-ng.umount
-ctid-ng.sync: sync.bootstrap ctid-ng.umount
-	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTIDNG_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid-ng
-	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-ctid-ng && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
-	ssh -q $(XIVO_HOSTNAME) 'mount --bind ~/dev/xivo-ctid-ng/build/lib.linux-*-2.7/xivo_ctid_ng ${REMOTE_PYTHONPATH}/xivo_ctid_ng'
-	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-ctid-ng/xivo_ctid_ng.egg-info ${REMOTE_PYTHONPATH}/xivo_ctid_ng-$(shell python $(CTIDNG_PATH)/setup.py --version).egg-info"
+.PHONY: ctid-ng.mount ctid-ng.umount
+ctid-ng.mount: xivo.mount ctid-ng.umount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_ctid_ng type\" || mount --bind /var/dev/xivo/xivo-ctid-ng/xivo_ctid_ng ${REMOTE_PYTHONPATH}/xivo_ctid_ng"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/xivo-ctid-ng/config.yml type\" || mount --bind /var/dev/xivo/xivo-ctid-ng/etc/xivo-ctid-ng/config.yml /etc/xivo-ctid-ng/config.yml"
 
 ctid-ng.umount:
-	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng || true'
-	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng-*.egg-info || true'
+	ssh $(XIVO_HOSTNAME) 'umount /etc/xivo-ctid-ng/config.yml || true'
+	ssh $(XIVO_HOSTNAME) "umount ${REMOTE_PYTHONPATH}/xivo_ctid_ng || true"
 
 ################################################################################
 # xivo-dao
@@ -442,16 +445,13 @@ upgrade.sync:
 # xivo-confd
 ################################################################################
 
-.PHONY : confd.sync confd.umount confd.ctags confd.clean confd.restart
-confd.sync: confd.umount sync.bootstrap
-	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CONFD_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-confd
-	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-confd && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
-	ssh -q $(XIVO_HOSTNAME) 'mount --bind ${TMP_PYTHONPATH}/xivo_confd-*-py2.7.egg/xivo_confd ${REMOTE_PYTHONPATH}/xivo_confd'
-	ssh -q $(XIVO_HOSTNAME) "mount --bind ${TMP_PYTHONPATH}/xivo_confd-*-py2.7.egg/EGG-INFO ${REMOTE_PYTHONPATH}/xivo_confd-$(shell $(CONFD_PATH)/setup.py --version).egg-info"
+.PHONY : confd.mount confd.umount confd.ctags confd.clean confd.restart
+
+confd.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_confd type\" || mount --bind /var/dev/xivo/xivo-confd/xivo_confd ${REMOTE_PYTHONPATH}/xivo_confd"
 
 confd.umount:
-	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confd || true'
-	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_confd-*.egg-info || true'
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_confd type\" && umount ${REMOTE_PYTHONPATH}/xivo_confd || true"
 
 confd.clean:
 	rm -rf $(CONFD_PATH)/.tox
@@ -602,6 +602,16 @@ plugind.mount: xivo.mount
 plugind.umount:
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/lib/wazo-plugind/templates type\" && umount /usr/lib/wazo-plugind/templates || true"
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind type\" && umount ${REMOTE_PYTHON3PATH}/wazo_plugind || true"
+
+################################################################################
+# wazo-plugind-cli
+################################################################################
+.PHONY : plugind-cli.mount plugind-cli.umount
+plugind-cli.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind_cli type\" || mount --bind /var/dev/xivo/wazo-plugind-cli/wazo_plugind_cli ${REMOTE_PYTHON3PATH}/wazo_plugind_cli"
+
+plugind-cli.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind_cli type\" && umount ${REMOTE_PYTHON3PATH}/wazo_plugind_cli || true"
 
 .PHONY: token.admin token.user
 token.admin:
