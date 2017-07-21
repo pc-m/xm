@@ -100,7 +100,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount
+xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
@@ -602,6 +602,27 @@ plugind.mount: xivo.mount
 plugind.umount:
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/lib/wazo-plugind/templates type\" && umount /usr/lib/wazo-plugind/templates || true"
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_plugind type\" && umount ${REMOTE_PYTHON3PATH}/wazo_plugind || true"
+
+################################################################################
+# wazo-webhookd
+################################################################################
+.PHONY : webhookd.mount webhookd.umount webhookd.sync webhookd.db-upgrade webhookd.db-downgrade
+webhookd.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_webhookd type\" || mount --bind /var/dev/xivo/wazo-webhookd/wazo_webhookd ${REMOTE_PYTHON3PATH}/wazo_webhookd"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/share/wazo-webhookd/alembic type\" || mount --bind /var/dev/xivo/wazo-webhookd/alembic /usr/share/wazo-webhookd/alembic"
+
+webhookd.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_webhookd type\" && umount ${REMOTE_PYTHON3PATH}/wazo_webhookd || true"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/share/wazo-webhookd/alembic type\" && umount /usr/share/wazo-webhookd/alembic || true"
+
+webhookd.sync: webhookd.mount
+	ssh $(XIVO_HOSTNAME) 'cd /var/dev/xivo/wazo-webhookd && python3 setup.py develop'
+
+webhookd.db-upgrade:
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/wazo-webhookd && alembic -c alembic.ini upgrade head'
+
+webhookd.db-downgrade:
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/wazo-webhookd && alembic -c alembic.ini downgrade -1'
 
 ################################################################################
 # wazo-plugind-cli
