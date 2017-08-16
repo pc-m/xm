@@ -100,7 +100,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount
+xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
@@ -642,3 +642,13 @@ token.admin:
 token.user:
 	@read -p "Username: " username; \
 	curl -ksX POST --header 'Content-Type: application/json' --header 'Accept: application/json' -u $$username  -d '{"backend": "xivo_user", "expiration": 36000}' "https://${XIVO_HOSTNAME}:9497/0.1/token" | jq -r '.[] | .token'
+
+################################################################################
+# admin-ui-plugins
+################################################################################
+.PHONY: admin-ui-market.mount admin-ui-market.umount
+admin-ui-market.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/wazo_admin_ui_market type\" || mount --bind /var/dev/xivo/wazo-admin-ui-market/wazo_admin_ui_market ${REMOTE_PYTHONPATH}/wazo_admin_ui_market"
+
+admin-ui-market.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/wazo_admin_ui_market type\" && umount ${REMOTE_PYTHONPATH}/wazo_admin_ui_market || true"
