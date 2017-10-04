@@ -100,7 +100,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount
+xivo.umount: auth.umount dao.umound dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
@@ -296,7 +296,13 @@ ctid-ng.umount:
 ################################################################################
 # xivo-dao
 ################################################################################
-.PHONY : dao.sync dao.ctags
+.PHONY : dao.mount dao.umount dao.sync dao.ctags
+dao.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_dao type\" || mount --bind /var/dev/xivo/xivo-dao/xivo_dao ${REMOTE_PYTHONPATH}/xivo_dao"
+
+dao.umount:
+	ssh $(XIVO_HOSTNAME) "umount ${REMOTE_PYTHONPATH}/xivo_dao || true"
+
 dao.sync:
 	$(SYNC) $(DAO_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
 
