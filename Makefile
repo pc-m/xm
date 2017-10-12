@@ -525,9 +525,14 @@ dialplan.umount:
 # lib-rest-client
 ################################################################################
 
-.PHONY : lib-rest-client.sync
-lib-rest-client.sync:
-	$(SYNC) $(LIB_REST_CLIENT_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+.PHONY : lib-rest-client.mount
+lib-rest-client.mount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/xivo_lib_rest_client type\" || mount --bind /var/dev/xivo/xivo-lib-rest-client/xivo_lib_rest_client ${REMOTE_PYTHON3PATH}/xivo_lib_rest_client"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_lib_rest_client type\" || mount --bind /var/dev/xivo/xivo-lib-rest-client/xivo_lib_rest_client ${REMOTE_PYTHONPATH}/xivo_lib_rest_client"
+
+lib-rest-client.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/xivo_lib_rest_client type\" && umount ${REMOTE_PYTHON3PATH}/xivo_lib_rest_client || true"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_lib_rest_client type\" && umount ${REMOTE_PYTHONPATH}/xivo_lib_rest_client || true"
 
 
 .PHONY : dird-client.sync
