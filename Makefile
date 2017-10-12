@@ -45,7 +45,6 @@ AGENT_LOCAL_PATH=$(AGENT_PATH)/xivo_agent
 AGI_LOCAL_PATH=$(AGI_PATH)/xivo_agid
 ALEMBIC_LOCAL_PATH=$(XIVO_PATH)/xivo-manage-db/alembic/versions
 AMID_LOCAL_PATH=$(XIVO_PATH)/xivo-amid/xivo_ami
-AUTH_LOCAL_PATH=$(XIVO_PATH)/xivo-auth/xivo_auth
 ASTERISK_LOCAL_PATH=$(shell /usr/bin/dirname $(shell /usr/bin/find $(ASTERISK_PATH) -name 'BUGS'))
 BUS_LOCAL_PATH=$(BUS_PATH)/xivo_bus
 CALL_LOGS_LOCAL_PATH=$(CALL_LOGS_PATH)/xivo_call_logs
@@ -107,32 +106,32 @@ xivo.mount:
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" || mount 10.37.0.1:${XIVO_PATH} /var/dev/xivo"
 
 ################################################################################
-# xivo-auth
+# wazo-auth
 ################################################################################
 .PHONY : auth.sync auth.mount auth.orig auth.restart auth.umount auth.db-upgrade auth.db_downgrade
 auth.mount: xivo.mount
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_auth type\" || mount --bind /var/dev/xivo/xivo-auth/xivo_auth ${REMOTE_PYTHONPATH}/xivo_auth"
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/share/xivo-auth/alembic type\" || mount --bind /var/dev/xivo/xivo-auth/alembic /usr/share/xivo-auth/alembic"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/wazo_auth type\" || mount --bind /var/dev/xivo/wazo-auth/wazo_auth ${REMOTE_PYTHONPATH}/wazo_auth"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/share/wazo-auth/alembic type\" || mount --bind /var/dev/xivo/wazo-auth/alembic /usr/share/wazo-auth/alembic"
 
 auth.sync: auth.mount
-	ssh $(XIVO_HOSTNAME) 'cd /var/dev/xivo/xivo-auth && python setup.py develop'
+	ssh $(XIVO_HOSTNAME) 'cd /var/dev/xivo/wazo-auth && python setup.py develop'
 
 auth.umount:
-	ssh $(XIVO_HOSTNAME) "umount ${REMOTE_PYTHONPATH}/xivo_auth || true"
-	ssh $(XIVO_HOSTNAME) "umount /usr/share/xivo-auth/alembic || true"
+	ssh $(XIVO_HOSTNAME) "umount ${REMOTE_PYTHONPATH}/wazo_auth || true"
+	ssh $(XIVO_HOSTNAME) "umount /usr/share/wazo-auth/alembic || true"
 
 auth.orig:
-	ssh $(XIVO_HOSTNAME) "cd /var/dev/xivo/xivo-auth && python setup.py develop --uninstall"
-	ssh $(XIVO_HOSTNAME) "rm -f /usr/local/bin/xivo-auth"
+	ssh $(XIVO_HOSTNAME) "cd /var/dev/xivo/wazo-auth && python setup.py develop --uninstall"
+	ssh $(XIVO_HOSTNAME) "rm -f /usr/local/bin/wazo-auth"
 
 auth.restart:
-	ssh $(XIVO_HOSTNAME) 'systemctl restart xivo-auth'
+	ssh $(XIVO_HOSTNAME) 'systemctl restart wazo-auth'
 
 auth.db-upgrade:
-	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/xivo-auth && alembic -c alembic.ini upgrade head'
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/wazo-auth && alembic -c alembic.ini upgrade head'
 
 auth.db-downgrade:
-	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/xivo-auth && alembic -c alembic.ini downgrade -1'
+	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/wazo-auth && alembic -c alembic.ini downgrade -1'
 
 ################################################################################
 # xivo-web-interface
