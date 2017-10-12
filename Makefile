@@ -255,16 +255,14 @@ confgend.umount:
 # xivo-ctid
 ################################################################################
 
-.PHONY : cti.sync cti.ctags cti.clean cti.umount cti.restart
-cti.sync: sync.bootstrap cti.umount
-	rsync -av --delete --exclude "*.git" --exclude "*.tox" $(CTI_PATH)/ $(XIVO_HOSTNAME):~/dev/xivo-ctid
-	ssh -q $(XIVO_HOSTNAME) "cd ~/dev/xivo-ctid && PYTHONPATH=${TMP_PYTHONPATH} python setup.py install --prefix=~/build"
-	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-ctid/build/lib.linux-*-2.7/xivo_cti ${REMOTE_PYTHONPATH}/xivo_cti"
-	ssh -q $(XIVO_HOSTNAME) "mount --bind ~/dev/xivo-ctid/xivo_ctid.egg-info ${REMOTE_PYTHONPATH}/xivo_ctid-$(shell $(CTI_PATH)/setup.py --version).egg-info"
+.PHONY : cti.mount cti.ctags cti.clean cti.umount cti.restart
+cti.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_cti type\" || mount --bind /var/dev/xivo/xivo-ctid/xivo_cti ${REMOTE_PYTHONPATH}/xivo_cti"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/xivo-ctid/config.yml type\" || mount --bind /var/dev/xivo/xivo-ctid/etc/xivo-ctid/config.yml /etc/xivo-ctid/config.yml"
 
 cti.umount:
 	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_cti || true'
-	ssh -q $(XIVO_HOSTNAME) 'umount ${REMOTE_PYTHONPATH}/xivo_ctid-*.egg-info || true'
+	ssh -q $(XIVO_HOSTNAME) 'umount /etc/xivo-ctid/config.yml || true'
 
 cti.ctags: cti.clean
 	ctags -o $(CTI_TAGS) -R -e $(CTI_LOCAL_PATH)
