@@ -99,7 +99,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dao.umound dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount
+xivo.umount: auth.umount dao.umound dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount wazo-auth-cli.umount
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
@@ -132,6 +132,17 @@ auth.db-upgrade:
 
 auth.db-downgrade:
 	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/wazo-auth && alembic -c alembic.ini downgrade -1'
+
+################################################################################
+# wazo-auth-cli
+################################################################################
+.PHONY : auth-cli.mount auth-cli.umount
+auth-cli.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/wazo-auth-cli/config.yml type\" || mount --bind /var/dev/xivo/wazo-auth-cli/etc/wazo-auth-cli/config.yml /etc/wazo-auth-cli/config.yml"
+
+auth-cli.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/wazo-auth-cli/config.yml type\" && umount /etc/wazo-auth-cli/config.yml"
+
 
 ################################################################################
 # xivo-web-interface
