@@ -231,22 +231,17 @@ bus.clean:
 	rm -f $(BUS_TAGS)
 
 ################################################################################
-# xivo-call-logs
+# wazo-call-logd
 ################################################################################
 
-.PHONY : call-logs.mount call-logs.umount call-logs.entry-points
+.PHONY : call-logs.mount call-logs.umount
 call-logs.mount: xivo.mount
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs type\" || mount --bind /var/dev/xivo/xivo-call-logs/xivo_call_logs ${REMOTE_PYTHONPATH}/xivo_call_logs"
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs-*.egg-info/entry_points.txt\" || if [[ -e \"/var/dev/xivo/xivo-call-logs/xivo_call_logs.egg-info/entry_points.txt\" ]]; then mount --bind /var/dev/xivo/xivo-call-logs/xivo_call_logs.egg-info/entry_points.txt ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt; fi"
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/xivo-call-logd/config.yml type\" || mount --bind /var/dev/xivo/xivo-call-logs/etc/xivo-call-logd/config.yml /etc/xivo-call-logd/config.yml"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_call_logd type\" || mount --bind /var/dev/xivo/wazo-call-logd/wazo_call_logd ${REMOTE_PYTHON3PATH}/wazo_call_logd"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/wazo-call-logd/config.yml type\" || mount --bind /var/dev/xivo/wazo-call-logs/etc/wazo-call-logd/config.yml /etc/wazo-call-logd/config.yml"
 
 call-logs.umount:
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs type\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs || true"
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt\" && umount ${REMOTE_PYTHONPATH}/xivo_call_logs-1.2.egg-info/entry_points.txt || true"
-	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/xivo-call-logd/config.yml type\" && umount /etc/xivo-call-logd/config.yml || true"
-
-call-logs.entry-points: xivo.mount
-	ssh $(XIVO_HOSTNAME) "cd /var/dev/xivo/xivo-call-logs && python setup.py egg_info"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_call_logd type\" && umount ${REMOTE_PYTHON3PATH}/wazo_call_logd || true"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/wazo-call-logd/config.yml type\" && umount /etc/wazo-call-logd/config.yml || true"
 
 
 ################################################################################
