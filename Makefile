@@ -288,7 +288,7 @@ cti.restart:
 ################################################################################
 
 .PHONY: ctid-ng.mount ctid-ng.umount
-ctid-ng.mount: xivo.mount ctid-ng.umount
+ctid-ng.mount: xivo.mount
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_ctid_ng type\" || mount --bind /var/dev/xivo/xivo-ctid-ng/xivo_ctid_ng ${REMOTE_PYTHONPATH}/xivo_ctid_ng"
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/xivo-ctid-ng/config.yml type\" || mount --bind /var/dev/xivo/xivo-ctid-ng/etc/xivo-ctid-ng/config.yml /etc/xivo-ctid-ng/config.yml"
 
