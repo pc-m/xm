@@ -671,6 +671,16 @@ token.user:
 	curl -ksX POST --header 'Content-Type: application/json' --header 'Accept: application/json' -u $$username  -d '{"backend": "xivo_user", "expiration": 36000}' "https://${XIVO_HOSTNAME}:9497/0.1/token" | jq -r '.[] | .token'
 
 ################################################################################
+# admin-ui
+################################################################################
+.PHONY: admin-ui.mount admin-ui.umount
+admin-ui.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_admin_ui type\" || mount --bind /var/dev/xivo/wazo-admin-ui/wazo_admin_ui ${REMOTE_PYTHON3PATH}/wazo_admin_ui"
+
+admin-ui.umount:
+	ssh $(XIVO_HOSTNAME) "umount ${REMOTE_PYTHON3PATH}/wazo_admin_ui || true"
+
+################################################################################
 # admin-ui-plugins
 ################################################################################
 .PHONY: admin-ui-market.mount admin-ui-market.umount
