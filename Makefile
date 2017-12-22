@@ -139,9 +139,11 @@ auth.db-downgrade:
 .PHONY : auth-cli.mount auth-cli.umount
 auth-cli.mount: xivo.mount
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/wazo-auth-cli/config.yml type\" || mount --bind /var/dev/xivo/wazo-auth-cli/etc/wazo-auth-cli/config.yml /etc/wazo-auth-cli/config.yml"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_auth_cli type\" || mount --bind /var/dev/xivo/wazo-auth-cli/wazo_auth_cli ${REMOTE_PYTHON3PATH}/wazo_auth_cli"
 
 auth-cli.umount:
 	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /etc/wazo-auth-cli/config.yml type\" && umount /etc/wazo-auth-cli/config.yml"
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHON3PATH}/wazo_auth_cli type\" && mount --bind /var/dev/xivo/wazo-auth-cli/wazo_auth_cli ${REMOTE_PYTHON3PATH}/wazo_auth_cli || true"
 
 
 ################################################################################
