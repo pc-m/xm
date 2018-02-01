@@ -99,7 +99,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dao.umound dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount wazo-auth-cli.umount xivo-websocketd.umount
+xivo.umount: auth.umount dao.umound dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount wazo-auth-cli.umount xivo-websocketd.umount db.umount
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
@@ -319,9 +319,12 @@ dao.ctags:
 ################################################################################
 # xivo-manage-db
 ################################################################################
-.PHONY : db.sync db.upgrade db.downgrade
-db.sync:
-	$(SYNC) $(ALEMBIC_LOCAL_PATH)/* $(XIVO_HOSTNAME):$(ALEMBIC_REMOTE_PATH)/
+.PHONY : db.mount db.umount db.upgrade db.downgrade
+db.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on /usr/share/xivo-manage-db/alembic type\" || mount --bind /var/dev/xivo/xivo-manage-db/alembic /usr/share/xivo-manage-db/alembic"
+
+db.umount:
+	ssh $(XIVO_HOSTNAME) "umount /usr/share/xivo-manage-db/alembic || true"
 
 db.upgrade:
 	ssh -q $(XIVO_HOSTNAME) 'cd /usr/share/xivo-manage-db && alembic upgrade +1'
