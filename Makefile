@@ -99,7 +99,7 @@ sync.bootstrap:
 	ssh -q $(XIVO_HOSTNAME) "mkdir -p ~/dev ${TMP_PYTHONPATH}"
 	$(SYNC) $(XM_PATH)/bin/00-pre-upgrade.sh $(XIVO_HOSTNAME):"/usr/share/xivo-upgrade/post-stop.d/"
 
-xivo.umount: auth.umount dao.umound dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount wazo-auth-cli.umount xivo-websocketd.umount db.umount
+xivo.umount: auth.umount dao.umound dird.umount confgen.umount cti.umount dialplan.umount ctid-ng.umount confd.umount plugind.umount bus.umount plugind-cli.umount webhookd.umount admin-ui-market.umount wazo-auth-cli.umount xivo-websocketd.umount db.umount sysconfd.umount
 	ssh -q $(XIVO_HOSTNAME) "mount | grep -q \"on /var/dev/xivo type\" && umount /var/dev/xivo"
 
 xivo.mount:
@@ -486,10 +486,12 @@ confd.restart:
 ################################################################################
 # xivo-sysconf
 ################################################################################
+.PHONY : sysconfd.mount sysconfd.umount
+sysconfd.mount: xivo.mount
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_sysconf type\" || mount --bind /var/dev/xivo/xivo-sysconfd/xivo_sysconf ${REMOTE_PYTHONPATH}/xivo_sysconf"
 
-.PHONY : sysconf.sync
-sysconf.sync:
-	$(SYNC) $(SYSCONF_LOCAL_PATH) $(XIVO_HOSTNAME):$(PYTHON_PACKAGES)
+sysconfd.umount:
+	ssh $(XIVO_HOSTNAME) "mount | grep -q \"on ${REMOTE_PYTHONPATH}/xivo_sysconf type\" && umount ${REMOTE_PYTHONPATH}/xivo_sysconf || true"
 
 # xivo-stat
 .PHONY : stat.sync
